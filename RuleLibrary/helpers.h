@@ -4,8 +4,8 @@
 
 namespace helpers {
 
-class reader {
-public:
+struct reader {
+
     static bool is_digit(char c)
     {
         return ('0' <= c && c <= '9') || c == '_';
