@@ -1,5 +1,6 @@
-#include "lexer.h"
 #include "pch.h"
+
+#include "lexer.h"
 #include <iostream>
 #include <vector>
 
@@ -11,7 +12,7 @@ std::string operator""_s(const char* data, std::size_t length)
 namespace test_lexer {
 
 struct LexerState {
-    using LessType = std::less<char>;
+    using less_type = std::less<char>;
     using iterator = std::string::const_iterator;
     LexerState(int val)
         : value(val)

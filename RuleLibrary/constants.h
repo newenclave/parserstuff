@@ -1,7 +1,7 @@
 #pragma once
 
 namespace constants {
-enum class Token : int {
+enum class token_type : int {
     NONE,
     AND,
     OR,
@@ -24,7 +24,7 @@ enum class Token : int {
     SEMICOLON,
 };
 
-enum class precedence : int {
+enum class precedence_type : int {
     LOWEST = -1,
     LOR = 1,
     LAND = 2,

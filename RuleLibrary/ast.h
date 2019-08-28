@@ -8,7 +8,7 @@ namespace ast {
 struct node {
     virtual ~node() = default;
     using uptr = std::unique_ptr<node>;
-    node(constants::Token t)
+    node(constants::token_type t)
         : token(t)
     {
     }
@@ -16,13 +16,13 @@ struct node {
     {
         return "None!";
     }
-    constants::Token token;
+    constants::token_type token;
 };
 
 struct ident : public node {
 
     ident(std::string val)
-        : node(constants::Token::IDENT)
+        : node(constants::token_type::IDENT)
         , value(std::move(val))
     {
     }
@@ -37,7 +37,7 @@ struct ident : public node {
 
 struct string : public node {
     string(std::string val)
-        : node(constants::Token::STRING)
+        : node(constants::token_type::STRING)
         , value(std::move(val))
     {
     }
@@ -51,7 +51,7 @@ struct string : public node {
 
 struct number : public node {
     number(std::int64_t val)
-        : node(constants::Token::NUMBER)
+        : node(constants::token_type::NUMBER)
         , value(val)
     {
     }
@@ -66,7 +66,7 @@ struct number : public node {
 struct logic_operator : public node {
 
     logic_operator(node::uptr l, node::uptr r, std::string o,
-                   constants::Token t)
+                   constants::token_type t)
         : node(t)
         , left(std::move(l))
         , right(std::move(r))
@@ -86,7 +86,7 @@ struct logic_operator : public node {
 
 struct LogicNotOperator : public node {
 
-    LogicNotOperator(node::uptr r, std::string o, constants::Token t)
+    LogicNotOperator(node::uptr r, std::string o, constants::token_type t)
         : node(t)
         , right(std::move(r))
         , oper(std::move(o))
@@ -104,7 +104,7 @@ struct LogicNotOperator : public node {
 struct binary_operator : public node {
 
     binary_operator(node::uptr l, node::uptr r, std::string o,
-                    constants::Token t)
+                    constants::token_type t)
         : node(t)
         , left(std::move(l))
         , right(std::move(r))

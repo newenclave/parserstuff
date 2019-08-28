@@ -59,7 +59,7 @@ public:
 
     template <typename ItrT, typename ContainerT>
     static std::basic_string<typename ItrT::value_type>
-    read_string(ItrT begin, ItrT end, const ContainerT& stop)
+    read_string(ItrT& begin, ItrT end, const ContainerT& stop)
     {
         using string_type = std::basic_string<typename ItrT::value_type>;
         string_type res;

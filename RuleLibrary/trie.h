@@ -207,13 +207,13 @@ private:
     }
 
     template <template <typename> class ResultType, typename IterT,
-              typename NodeType>
-    static ResultType<IterT> get_s(NodeType next_table, IterT b, const IterT& e,
-                                   bool greedy)
+              typename node_type>
+    static ResultType<IterT> get_s(node_type next_table, IterT b,
+                                   const IterT& e, bool greedy)
     {
         using result_type = ResultType<IterT>;
 
-        NodeType last_final = nullptr;
+        node_type last_final = nullptr;
 
         if (b == e) {
             return result_type(nullptr, b, e);

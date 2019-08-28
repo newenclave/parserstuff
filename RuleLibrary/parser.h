@@ -7,28 +7,30 @@
 //    Lexemtype::IdType some integral type
 //    Lexemtype::IdType Lexemtype::id() -- call to get Id by intance
 
-template <typename NodeType, typename LexemType>
-class Parser {
+template <typename NodeT, typename LexemT>
+class parser {
 public:
-    class State {
-        friend class Parser;
-        State(typename std::vector<LexemType>::const_iterator current,
-              typename std::vector<LexemType>::const_iterator next)
+    using node_type = NodeT;
+    using lexem_type = LexemT;
+    class state {
+        friend class parser;
+        state(typename std::vector<lexem_type>::const_iterator current,
+              typename std::vector<lexem_type>::const_iterator next)
         {
             current_ = current;
             next_ = next;
         }
-        typename std::vector<LexemType>::const_iterator current_;
-        typename std::vector<LexemType>::const_iterator next_;
+        typename std::vector<lexem_type>::const_iterator current_;
+        typename std::vector<lexem_type>::const_iterator next_;
     };
 
-    using LedCallType = std::function<NodeType(NodeType)>;
-    using NudCallType = std::function<NodeType()>;
+    using led_call_type = std::function<node_type(node_type)>;
+    using nud_call_type = std::function<node_type()>;
 
-    using IdType = typename LexemType::IdType;
-    virtual ~Parser() = default;
+    using id_type = typename lexem_type::id_type;
+    virtual ~parser() = default;
 
-    Parser(std::vector<LexemType> lexem)
+    parser(std::vector<lexem_type> lexem)
         : lexem_(std::move(lexem))
         , current_(lexem_.begin())
         , next_(lexem_.begin())
@@ -37,40 +39,40 @@ public:
     }
 
     template <typename CallT>
-    void setLed(IdType id, CallT call)
+    void set_led(id_type id, CallT call)
     {
         leds_[id] = std::move(call);
     }
 
     template <typename CallT>
-    void setNud(IdType id, CallT call)
+    void set_nud(id_type id, CallT call)
     {
         nuds_[id] = std::move(call);
     }
 
     template <typename CallT>
-    void setDefaultNud(CallT call)
+    void set_default_nud(CallT call)
     {
         default_nud_ = std::move(call);
     }
 
     template <typename CallT>
-    void setDefaultLed(CallT call)
+    void set_default_led(CallT call)
     {
         default_led_ = std::move(call);
     }
 
-    void setPrecedense(IdType id, int value)
+    void set_precedense(id_type id, int value)
     {
         precedenses_[id] = value;
     }
 
-    NodeType parseExpression(int p)
+    node_type parse_expression(int p)
     {
-        auto nud = nuds_.find(LexemType::id(current()));
-        NodeType left;
+        auto nud = nuds_.find(lexem_type::id(current()));
+        node_type left;
         if (nud == nuds_.end()) {
-            left = defaultNud();
+            left = default_nud();
         } else {
             left = nud->second();
         }
@@ -79,13 +81,13 @@ public:
             return nullptr;
         }
 
-        int pp = nextPrecednse();
-        LexemType pt = next();
+        int pp = next_precednse();
+        lexem_type pt = next();
         while (p < pp) {
             auto led_call
-                = [this](auto left) { return defaultLed(std::move(left)); };
+                = [this](auto left) { return default_led(std::move(left)); };
 
-            auto led = leds_.find(LexemType::id(pt));
+            auto led = leds_.find(lexem_type::id(pt));
             if (led != leds_.end()) {
                 led_call = led->second;
             }
@@ -96,7 +98,7 @@ public:
                 return left;
             }
 
-            pp = nextPrecednse();
+            pp = next_precednse();
             pt = next();
         }
         return left;
@@ -105,14 +107,14 @@ public:
     void advance()
     {
         current_ = next_;
-        if (!nextEof()) {
+        if (!next_eof()) {
             ++next_;
         }
     }
 
-    bool expect(IdType id)
+    bool expect(id_type id)
     {
-        if (!nextEof() && LexemType::id(next()) == id) {
+        if (!next_eof() && lexem_type::id(next()) == id) {
             advance();
             return true;
         }
@@ -124,70 +126,70 @@ public:
         return current_ == lexem_.cend();
     }
 
-    bool nextEof() const
+    bool next_eof() const
     {
         return next_ == lexem_.cend();
     }
 
-    LexemType current() const
+    lexem_type current() const
     {
-        return eof() ? LexemType{} : *current_;
+        return eof() ? lexem_type{} : *current_;
     }
 
-    LexemType next() const
+    lexem_type next() const
     {
-        return nextEof() ? LexemType{} : *next_;
+        return next_eof() ? lexem_type{} : *next_;
     }
 
-    int currentPrecednse()
+    int current_precednse()
     {
-        return itrPrecednse(current_);
+        return itr_precednse(current_);
     }
 
-    int nextPrecednse()
+    int next_precednse()
     {
-        return itrPrecednse(next_);
+        return itr_precednse(next_);
     }
 
-    NodeType defaultNud() const
+    node_type default_nud() const
     {
-        return default_nud_ ? default_nud_() : NodeType{};
+        return default_nud_ ? default_nud_() : node_type{};
     }
 
-    NodeType defaultLed(NodeType left) const
+    node_type default_led(node_type left) const
     {
-        return default_led_ ? default_led_(std::move(left)) : NodeType{};
+        return default_led_ ? default_led_(std::move(left)) : node_type{};
     }
 
-    State store() const
+    state store() const
     {
         return { current_, next_ };
     }
 
-    void restore(State state)
+    void restore(state state)
     {
         current_ = state.current_;
         next_ = state.next_;
     }
 
 private:
-    int itrPrecednse(typename std::vector<LexemType>::const_iterator itr)
+    int itr_precednse(typename std::vector<lexem_type>::const_iterator itr)
     {
         if (itr == lexem_.cend()) {
             return -1;
         }
-        auto found = precedenses_.find(LexemType::id(*itr));
+        auto found = precedenses_.find(lexem_type::id(*itr));
         return found == precedenses_.end() ? -1 : found->second;
     }
 
-    std::map<IdType, NudCallType> nuds_;
-    std::map<IdType, LedCallType> leds_;
+    std::map<id_type, nud_call_type> nuds_;
+    std::map<id_type, led_call_type> leds_;
 
-    NudCallType default_nud_;
-    LedCallType default_led_;
+    nud_call_type default_nud_;
+    led_call_type default_led_;
 
-    std::map<IdType, int> precedenses_;
-    std::vector<LexemType> lexem_;
-    typename std::vector<LexemType>::const_iterator current_;
-    typename std::vector<LexemType>::const_iterator next_;
+    std::map<id_type, int> precedenses_;
+    std::vector<lexem_type> lexem_;
+    typename std::vector<lexem_type>::const_iterator current_;
+    typename std::vector<lexem_type>::const_iterator next_;
 };

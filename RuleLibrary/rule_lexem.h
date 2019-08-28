@@ -1,42 +1,45 @@
 #pragma once
-#include "constants.h"
+#include <algorithm>
 #include <string>
 
-template <typename CharType = char>
+#include "constants.h"
+
+template <typename CharT = char, typename LessType = std::less<CharT>>
 class rule_lexem {
 public:
-    using string_type = std::basic_string<CharType>;
+    using string_type = std::basic_string<CharT>;
+    using less_type = LessType;
 
-    struct Position {
-        int line = 0;
-        int pos = 0;
+    struct position_type {
+        std::size_t line = 0;
+        std::size_t pos = 0;
     };
 
-    using IdType = constants::Token;
+    using id_type = constants::token_type;
 
-    rule_lexem(IdType token)
-        : token_(token)
+    rule_lexem(position_type pos)
+        : position_(pos)
     {
     }
     rule_lexem() = default;
-    rule_lexem(RuleLexem&&) = default;
-    rule_lexem& operator=(RuleLexem&&) = default;
-    rule_lexem(const RuleLexem&) = default;
-    rule_lexem& operator=(const RuleLexem&) = default;
+    rule_lexem(rule_lexem&&) = default;
+    rule_lexem& operator=(rule_lexem&&) = default;
+    rule_lexem(const rule_lexem&) = default;
+    rule_lexem& operator=(const rule_lexem&) = default;
 
-    static IdType id(const RuleLexem& value)
+    static id_type id(const rule_lexem& value)
     {
         return value.token();
     }
 
-    const Position& position() const
+    const position_type& position() const
     {
         return position_;
     }
 
-    void set_position(Position new_value) const
+    void set_position(position_type new_value) const
     {
-        position_ = newValue;
+        position_ = new_value;
     }
 
     string_type raw_value() const
@@ -54,19 +57,24 @@ public:
         return value_;
     }
 
-    void value(string_type new_value)
+    void set_value(string_type new_value)
     {
         value_ = new_value;
     }
 
-    IdType token() const
+    id_type token() const
     {
         return token_;
+    }
+
+    void set_token(id_type val)
+    {
+        token_ = val;
     }
 
 private:
     string_type value_;
     string_type raw_value_;
-    IdType token_;
-    position position_;
+    id_type token_ = constants::token_type::NONE;
+    position_type position_;
 };

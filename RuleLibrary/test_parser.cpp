@@ -1,11 +1,12 @@
-#include "parser.h"
 #include "pch.h"
+
+#include "parser.h"
 #include <iostream>
 #include <vector>
 
 struct TestState {
-    using IdType = int;
-    static IdType id(const TestState& state)
+    using id_type = int;
+    static id_type id(const TestState& state)
     {
         return state.id_;
     }
@@ -16,7 +17,7 @@ struct TestNode {
     int id;
 };
 
-using TestParser = Parser<TestNode, TestState>;
+using TestParser = parser<TestNode, TestState>;
 
 namespace test_parser {
 void run()

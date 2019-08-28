@@ -10,7 +10,7 @@ public:
     using const_iterator = typename ConteinerType::const_iterator;
 
     using state_type = StateTrait;
-    using less_type = typename state_type::LessType;
+    using less_type = typename state_type::less_type;
 
     class internal_state {
     public:
@@ -21,7 +21,7 @@ public:
         internal_state& operator=(const internal_state&) = default;
 
         internal_state(const_iterator b, const_iterator e)
-            : _begin()
+            : _begin(b)
             , _end(e)
         {
         }
