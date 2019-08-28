@@ -41,6 +41,19 @@ public:
         return std::find_if_not(begin, end, [](auto c) { return is_space(c); });
     }
 
+    template <typename Itr>
+    static Itr read_ident(Itr begin, Itr end)
+    {
+        return std::find_if_not(begin, end, [](auto c) { return is_ident(c); });
+    }
+
+    template <typename Itr>
+    static Itr read_number(Itr begin, Itr end)
+    {
+        return std::find_if_not(begin, end, [](auto c) { return is_digit(c); });
+    }
+
+
     template <typename Itr, typename Itr2>
     static bool begins_with(Itr bTest, Itr eTest, Itr2 bVal, Itr2 eVal)
     {

@@ -35,13 +35,13 @@ public:
         lexer_.add_factory({ '\'' },
                            create_string_factory(string_type{ '\'' }));
         lexer_.add_factory({ 'a', 'n', 'd' },
-                           create_token(constants::token_type::AND));
+                           create_token_ident(constants::token_type::AND));
         lexer_.add_factory({ 'o', 'r' },
-                           create_token(constants::token_type::OR));
+                           create_token_ident(constants::token_type::OR));
         lexer_.add_factory({ 'e', 'q' },
-                           create_token(constants::token_type::EQ));
+                           create_token_ident(constants::token_type::EQ));
         lexer_.add_factory({ 'n', 'o', 't' },
-                           create_token(constants::token_type::NOT));
+                           create_token_ident(constants::token_type::NOT));
     }
 
     void reset(string_type input)
@@ -90,6 +90,23 @@ private:
         current_ = helpers::reader::skip_spaces(current_, end_);
     }
 
+    token_state_factory create_token_ident(id_type id)
+    {
+        return [this, id](auto state, auto istate) {
+            current_ = istate.end();
+            if (current_ != end_ && helpers::reader::is_ident(*current_)) {
+                current_ = helpers::reader::read_ident(current_, end_);
+                state.set_raw_value(string_type{ istate.begin(), current_ });
+                state.set_token(constants::token_type::IDENT);
+            } else {
+                state.set_raw_value(
+                    string_type{ istate.begin(), istate.end() });
+                state.set_token(id);
+            }
+            return state;
+        };
+    }
+
     token_state_factory create_token(id_type id)
     {
         return [this, id](auto state, auto istate) {
@@ -132,9 +149,42 @@ private:
         };
     }
 
+    lexem_type read_ident(lexem_type state)
+    {
+        auto begin = current_;
+        current_ = helpers::reader::read_ident(current_, end_);
+        state.set_raw_value(string_type{ begin, current_ });
+        state.set_token(constants::token_type::IDENT);
+        return state;
+    }
+
+    lexem_type read_number(lexem_type state)
+    {
+        auto begin = current_;
+        if (helpers::reader::check_if_float(begin, end_)) {
+            double res = helpers::reader::read_float(current_, end_);
+            state.set_raw_value(string_type{ begin, current_ });
+            state.set_token(constants::token_type::FLOAT);
+        } else {
+            current_ = helpers::reader::read_number(current_, end_);
+            state.set_raw_value(string_type{ begin, current_ });
+            state.set_token(constants::token_type::NUMBER);
+        }
+        return state;
+    }
+
     token_state_factory create_default_factory()
     {
-        return [this](auto state, auto internal_state) { return state; };
+        return [this](auto state, auto) {
+            if (!eol()) {
+                if (helpers::reader::is_digit(*current_)) {
+                    return read_number(std::move(state));
+                } else if (helpers::reader::is_ident(*current_)) {
+                    return read_ident(std::move(state));
+                }
+            }
+            return state;
+        };
     }
 
     static std::vector<std::size_t> make_new_lines_map(const string_type& input)
