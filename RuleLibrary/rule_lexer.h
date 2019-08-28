@@ -7,9 +7,9 @@
 #include "lexer.h"
 #include "rule_lexem.h"
 
-template <typename CharT>
+template <typename CharT, typename LessType = std::less<CharT>>
 class rule_lexer {
-    using lexem_type = rule_lexem<CharT>;
+    using lexem_type = rule_lexem<CharT, LessType>;
     using string_type = std::basic_string<CharT>;
     using iterator = typename string_type::const_iterator;
     using lexer_type = lexer<string_type, lexem_type>;
@@ -26,6 +26,14 @@ public:
     rule_lexer& operator=(const rule_lexer&) = delete;
     rule_lexer(rule_lexer&&) = delete;
     rule_lexer& operator=(rule_lexer&&) = delete;
+
+    rule_lexer()
+        : newline_map_(make_new_lines_map({}))
+        , current_(input_.cbegin())
+        , end_(input_.cend())
+        , lexer_(create_lexem_factory(), create_default_factory())
+    {
+    }
 
     rule_lexer(string_type input)
         : newline_map_(make_new_lines_map(input))
