@@ -24,6 +24,8 @@ public:
 
     rule_lexer(const rule_lexer&) = delete;
     rule_lexer& operator=(const rule_lexer&) = delete;
+    rule_lexer(rule_lexer&&) = delete;
+    rule_lexer& operator=(rule_lexer&&) = delete;
 
     rule_lexer(string_type input)
         : newline_map_(make_new_lines_map(input))
@@ -40,22 +42,29 @@ public:
                            create_string_factory(make_name("]"),
                                                  constants::token_type::IDENT));
 
+        lexer_.add_factory(
+            make_name("true"),
+            create_token_ident(constants::token_type::BOOL_TRUE));
+        lexer_.add_factory(
+            make_name("false"),
+            create_token_ident(constants::token_type::BOOL_FALSE));
+
         lexer_.add_factory(make_name("and"),
                            create_token_ident(constants::token_type::AND));
         lexer_.add_factory(make_name("or"),
                            create_token_ident(constants::token_type::OR));
         lexer_.add_factory(make_name("="),
-                           create_token_ident(constants::token_type::EQ));
+                           create_token(constants::token_type::EQ));
         lexer_.add_factory(make_name("!="),
-                           create_token_ident(constants::token_type::NOTEQ));
+                           create_token(constants::token_type::NOTEQ));
         lexer_.add_factory(make_name("<>"),
-                           create_token_ident(constants::token_type::NOTEQ));
+                           create_token(constants::token_type::NOTEQ));
         lexer_.add_factory(make_name("not"),
                            create_token_ident(constants::token_type::NOT));
         lexer_.add_factory(make_name("<"),
-                           create_token_ident(constants::token_type::LT));
+                           create_token(constants::token_type::LT));
         lexer_.add_factory(make_name("<="),
-                           create_token_ident(constants::token_type::LEQ));
+                           create_token(constants::token_type::LEQ));
         lexer_.add_factory(make_name(">"),
                            create_token(constants::token_type::GT));
         lexer_.add_factory(make_name(">="),
@@ -98,6 +107,12 @@ public:
         return result;
     }
 
+    std::vector<lexem_type> read_all(string_type input)
+    {
+        reset(std::move(input));
+        return read_all();
+    }
+
 private:
     using token_state_factory = typename lexer_type::token_state_factory;
 
@@ -128,10 +143,12 @@ private:
             if (current_ != end_ && helpers::reader::is_ident(*current_)) {
                 current_ = helpers::reader::read_ident(current_, end_);
                 state.set_raw_value(string_type{ istate.begin(), current_ });
+                state.set_value(string_type{ istate.begin(), current_ });
                 state.set_token(constants::token_type::IDENT);
             } else {
                 state.set_raw_value(
                     string_type{ istate.begin(), istate.end() });
+                state.set_value(string_type{ istate.begin(), istate.end() });
                 state.set_token(id);
             }
             return state;
@@ -198,10 +215,12 @@ private:
         if (helpers::reader::check_if_float(begin, end_)) {
             double res = helpers::reader::read_float(current_, end_);
             state.set_raw_value(string_type{ begin, current_ });
+            state.set_value(string_type{ begin, current_ });
             state.set_token(constants::token_type::FLOAT);
         } else {
             current_ = helpers::reader::read_number(current_, end_);
             state.set_raw_value(string_type{ begin, current_ });
+            state.set_value(string_type{ begin, current_ });
             state.set_token(constants::token_type::NUMBER);
         }
         return state;

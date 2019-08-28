@@ -24,8 +24,9 @@ int main()
     std::string value = "    \n\t123";
     std::string value2 = "123 string!\"";
 
-    rule_lexer<char> rl("     \"test string\" and or not eq or1 eqblah "
-                        "\nandbruh 123 0.45 \ntestident");
+    rule_lexer<char> rl(
+        "     \"test string\" and or not eq or1 eqblah "
+        "\nandbruh 123 0.45 \ntestident [not] [and] true false true1 == ==1");
     auto val = rl.read_all();
     for (auto v : val) {
         std::cout << v.raw_value() << " " << (int)v.token() << ": "

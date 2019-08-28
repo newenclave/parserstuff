@@ -24,6 +24,9 @@ enum class token_type : int {
     LBRACE,
     RBRACE,
 
+    BOOL_FALSE,
+    BOOL_TRUE,
+
     SEMICOLON,
 };
 
