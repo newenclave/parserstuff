@@ -12,7 +12,8 @@ enum class token_type : int {
     GEQ,
     NOT,
     NOTEQ,
-    CONTAINS,
+    IN,
+
     IDENT,
     NUMBER,
     FLOAT,
@@ -20,6 +21,8 @@ enum class token_type : int {
 
     LPAREN,
     RPAREN,
+    LBRACE,
+    RBRACE,
 
     SEMICOLON,
 };

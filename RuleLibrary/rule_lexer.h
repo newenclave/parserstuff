@@ -1,4 +1,5 @@
 #pragma once
+#include <numeric>
 #include <vector>
 
 #include "constants.h"
@@ -31,17 +32,38 @@ public:
         , end_(input_.cend())
         , lexer_(create_lexem_factory(), create_default_factory())
     {
-        lexer_.add_factory({ '"' }, create_string_factory(string_type{ '"' }));
-        lexer_.add_factory({ '\'' },
-                           create_string_factory(string_type{ '\'' }));
-        lexer_.add_factory({ 'a', 'n', 'd' },
+        lexer_.add_factory(make_name("\""),
+                           create_string_factory(make_name("\"")));
+        lexer_.add_factory(make_name("\'"),
+                           create_string_factory(make_name("\'")));
+        lexer_.add_factory(make_name("["),
+                           create_string_factory(make_name("]"),
+                                                 constants::token_type::IDENT));
+
+        lexer_.add_factory(make_name("and"),
                            create_token_ident(constants::token_type::AND));
-        lexer_.add_factory({ 'o', 'r' },
+        lexer_.add_factory(make_name("or"),
                            create_token_ident(constants::token_type::OR));
-        lexer_.add_factory({ 'e', 'q' },
+        lexer_.add_factory(make_name("="),
                            create_token_ident(constants::token_type::EQ));
-        lexer_.add_factory({ 'n', 'o', 't' },
+        lexer_.add_factory(make_name("!="),
+                           create_token_ident(constants::token_type::NOTEQ));
+        lexer_.add_factory(make_name("<>"),
+                           create_token_ident(constants::token_type::NOTEQ));
+        lexer_.add_factory(make_name("not"),
                            create_token_ident(constants::token_type::NOT));
+        lexer_.add_factory(make_name("<"),
+                           create_token_ident(constants::token_type::LT));
+        lexer_.add_factory(make_name("<="),
+                           create_token_ident(constants::token_type::LEQ));
+        lexer_.add_factory(make_name(">"),
+                           create_token(constants::token_type::GT));
+        lexer_.add_factory(make_name(">="),
+                           create_token(constants::token_type::GEQ));
+        lexer_.add_factory(make_name("("),
+                           create_token(constants::token_type::LPAREN));
+        lexer_.add_factory(make_name(")"),
+                           create_token(constants::token_type::RPAREN));
     }
 
     void reset(string_type input)
@@ -78,6 +100,15 @@ public:
 
 private:
     using token_state_factory = typename lexer_type::token_state_factory;
+
+    string_type make_name(const std::string val)
+    {
+        string_type result;
+        for (auto c : val) {
+            result.push_back(static_cast<CharT>(c));
+        }
+        return result;
+    }
 
     lexem_type next()
     {
@@ -117,15 +148,18 @@ private:
         };
     }
 
+    // clang-format off
     template <typename ContainerT>
-    token_state_factory create_string_factory(ContainerT ending)
+    token_state_factory create_string_factory(ContainerT ending,
+                  constants::token_type tok = constants::token_type::STRING)
+    // clang-format on
     {
-        return [this, ending](auto state, auto istate) {
+        return [this, ending, tok](auto state, auto istate) {
             current_ = istate.end();
             auto value = helpers::reader::read_string(current_, end_, ending);
             state.set_raw_value(string_type{ istate.begin(), current_ });
             state.set_value(std::move(value));
-            state.set_token(constants::token_type::STRING);
+            state.set_token(tok);
             return state;
         };
     }
