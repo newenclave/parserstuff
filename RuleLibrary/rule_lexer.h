@@ -17,6 +17,9 @@ public:
         iterator current;
     };
 
+	rule_lexer(const rule_lexer &) = delete;
+	rule_lexer& operator = (const rule_lexer &) = delete;
+
     rule_lexer(string_type input)
         : newline_map_(make_new_lines_map(input))
         , input_(std::move(input))
@@ -25,20 +28,13 @@ public:
     {
     }
 
-    void swap(rule_lexer& other)
-    {
-        std::swap(other.newline_map_, newline_map_);
-        std::swap(other.input_, input_);
-        std::swap(other.current_, current_);
-        std::swap(other.end_, end_);
-        std::swap(other.lexer_, lexer_)
-    }
-
     void reset(string_type input)
     {
-        rule_lexer tmp(std::move(input));
-        swap(tmp);
-    }
+		newline_map_ = make_new_lines_map(input);
+		input_ = std::move(input);
+		current_ = input_.cbegin();
+		end_ = input_.cend();
+	}
 
     internal_state store() const
     {
@@ -56,6 +52,15 @@ public:
     }
 
 private:
+
+	lexer_type::create_state_factory create_lexem_factory()
+	{
+		return [this]() {
+			lexem_type inst;
+			inst.set_position();
+		};
+	}
+
     static std::vector<std::size_t> make_new_lines_map(const string_type& input)
     {
         std::vector<std::size_t> result;
