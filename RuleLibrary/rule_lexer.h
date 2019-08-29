@@ -18,6 +18,7 @@ public:
     using id_type = typename lexem_type::id_type;
 
     class internal_state {
+	private:
         friend class rule_lexer;
         iterator current;
     };
