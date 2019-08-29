@@ -7,7 +7,8 @@
 template <typename CharT = char, typename LessType = std::less<CharT>>
 class rule_lexem {
 public:
-    using string_type = std::basic_string<CharT>;
+    using char_type = CharT;
+    using string_type = std::basic_string<char_type>;
     using less_type = LessType;
 
     struct position_type {

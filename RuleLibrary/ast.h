@@ -1,117 +1,214 @@
 #pragma once
-#include "constants.h"
 #include <memory>
 #include <string>
 
+#include "constants.h"
+#include "helpers.h"
+
 namespace ast {
 
-	enum ast_type: int {
-		NONE,
-		NUMBER,
-		FLOAT,
-		BOOLEAN,
-		STRING,
-		OPERATOR,
-		PREFIX_OPERATOR,
-	};
+enum node_type : int {
+    NONE,
+    NUMBER,
+    FLOAT,
+    BOOLEAN,
+    STRING,
+    OPERATOR,
+    PREFIX_OPERATOR,
+};
 
 template <typename CharT>
 class node {
 public:
-	using char_type = CharT;
-	using string_type = std::basic_string<char_type>;
+    using char_type = CharT;
+    using string_type = std::basic_string<char_type>;
     virtual ~node() = default;
     using uptr = std::unique_ptr<node>;
-    
-	node(ast_type t)
+
+    node(node_type t)
         : type_(t)
     {
     }
 
     virtual string_type to_string() const
     {
-		return {'N', 'u', 'l', 'l', '\0'};
+        return helpers::strings::to_string<CharT>("none");
     }
 
-	ast_type type() const
-	{
-		return type_;
-	}
+    node_type type() const
+    {
+        return type_;
+    }
 
 private:
-
-	ast_type type_;
+    node_type type_;
 };
 
 template <typename CharT>
-class string : public node<CharT>
-{
+class string : public node<CharT> {
 public:
-	using string_type = typename node<CharT>::string_type;
-	string(string_type val)
-		:node(ast_type::STRING)
-		,value(std::move(val))
-	{}
-	const string_type &value() const 
-	{
-		return value_;
-	}
-	string_type to_string() const override
-	{
-		return '"' + value_ + '"';
-	}
+    using string_type = typename node<CharT>::string_type;
+    string(string_type val)
+        : node(node_type::STRING)
+        , value(std::move(val))
+    {
+    }
+    const string_type& value() const
+    {
+        return value_;
+    }
+    string_type to_string() const override
+    {
+        return '"' + value_ + '"';
+    }
+
 private:
-	string_type value_;
+    string_type value_;
 };
 
 template <typename CharT>
-class floating : public node<CharT>
-{
+class floating : public node<CharT> {
 public:
-	using string_type = typename node<CharT>::string_type;
-	floating(double val)
-		:node(ast_type::FLOAT)
-		,value(val)
-	{}
-	
-	double value() const 
-	{
-		return value_;
-	}
-	
-	string_type to_string() const override
-	{
-		std::basic_stringstream<CharT> ss;
-		ss << value_;
-		return ss.str();
-	}
+    using string_type = typename node<CharT>::string_type;
+    floating(double val)
+        : node(node_type::FLOAT)
+        , value(val)
+    {
+    }
+
+    double value() const
+    {
+        return value_;
+    }
+
+    string_type to_string() const override
+    {
+        std::basic_stringstream<CharT> ss;
+        ss << value_;
+        return ss.str();
+    }
+
 private:
-	double value_;
+    double value_;
 };
 
 template <typename CharT>
-class number : public node<CharT>
-{
+class number : public node<CharT> {
 public:
-	using string_type = typename node<CharT>::string_type;
-	number(std::int64_t val)
-		:node(ast_type::NUMBER)
-		,value(val)
-	{}
+    using string_type = typename node<CharT>::string_type;
+    number(std::int64_t val)
+        : node<CharT>(node_type::NUMBER)
+        , value_(val)
+    {
+    }
 
-	double value() const 
-	{
-		return value_;
-	}
+    double value() const
+    {
+        return value_;
+    }
 
-	string_type to_string() const override
-	{
-		std::basic_stringstream<CharT> ss;
-		ss << value_;
-		return ss.str();
-	}
+    string_type to_string() const override
+    {
+        std::basic_stringstream<CharT> ss;
+        ss << value_;
+        return ss.str();
+    }
+
 private:
-	std::int64_t value_;
+    std::int64_t value_;
 };
 
+template <typename CharT>
+class boolean : public node<CharT> {
+public:
+    using string_type = typename node<CharT>::string_type;
+    boolean(bool val)
+        : node(node_type::BOOLEAN)
+        , value(val)
+    {
+    }
+
+    bool value() const
+    {
+        return value_;
+    }
+
+    string_type to_string() const override
+    {
+        return value_ ? helpers::strings::to_string<CharT>("true")
+                      : helpers::strings::to_string<CharT>("false");
+    }
+
+private:
+    bool value_;
+};
+
+template <typename CharT>
+class operator_node : public node<CharT> {
+public:
+    using node_uptr = typename node<CharT>::uptr;
+    using string_type = typename node<CharT>::string_type;
+    using stream_type = std::basic_stringstream<CharT>;
+    operator_node(constants::token_type operation, node_uptr left,
+                  node_uptr right)
+        : node(node_type::OPERATOR)
+        , left_(std::move(left))
+        , right_(std::move(right))
+    {
+    }
+
+    const node_uptr& lvalue() const
+    {
+        return left_;
+    }
+
+    const node_uptr& rvalue() const
+    {
+        return right_;
+    }
+
+    string_type to_string() const override
+    {
+        stream_type sss;
+        sss << '(' << left_->to_string() << ' '
+            << constants::token_to_string(operation_) << ' '
+            << right_->to_string() << ')';
+        return sss.str();
+    }
+
+private:
+    constants::token_type operation_;
+    node_uptr left_;
+    node_uptr right_;
+};
+
+template <typename CharT>
+class prefix_operator : public node<CharT> {
+public:
+    using node_uptr = typename node<CharT>::uptr;
+    using string_type = typename node<CharT>::string_type;
+    using stream_type = std::basic_stringstream<CharT>;
+
+    prefix_operator(constants::token_type operation, node_uptr right)
+        : node(node_type::PREFIX_OPERATOR)
+    {
+    }
+
+    const node_uptr& value() const
+    {
+        return right_;
+    }
+
+    string_type to_string() const override
+    {
+        stream_type sss;
+        sss << '(' << constants::token_to_string(operation_) << ' '
+            << right_->to_string() << ')';
+        return sss.str();
+    }
+
+private:
+    constants::token_type operation_;
+    node_uptr right_;
+};
 }

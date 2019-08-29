@@ -4,6 +4,25 @@
 
 namespace helpers {
 
+struct strings {
+
+    template <typename CharT, typename ItrT>
+    static std::basic_string<CharT> to_string(ItrT begin, ItrT end)
+    {
+        std::basic_string<CharT> result;
+        for (; (begin != end) && (*begin != static_cast<CharT>(0)); ++begin) {
+            result.push_back(static_cast<CharT>(*begin));
+        }
+        return result;
+    }
+
+    template <typename CharT, typename ContT>
+    static std::basic_string<CharT> to_string(const ContT& container)
+    {
+        return to_string<CharT>(std::begin(container), std::end(container));
+    }
+};
+
 struct reader {
 
     static bool is_digit(char c)
@@ -52,7 +71,6 @@ struct reader {
     {
         return std::find_if_not(begin, end, [](auto c) { return is_digit(c); });
     }
-
 
     template <typename Itr, typename Itr2>
     static bool begins_with(Itr bTest, Itr eTest, Itr2 bVal, Itr2 eVal)

@@ -2,13 +2,14 @@
 // begins and ends there.
 //
 #include "pch.h"
+#include <iostream>
 
 #include "ast.h"
 #include "helpers.h"
 #include "lexer.h"
 #include "parser.h"
 #include "rule_lexer.h"
-#include <iostream>
+#include "rule_parser.h"
 
 namespace test_lexer {
 void run();
@@ -32,5 +33,8 @@ int main()
         std::cout << v.raw_value() << " " << (int)v.token() << ": "
                   << v.position().line << ":" << v.position().pos << "\n";
     }
+
+    rule_parser<typename rule_lexer<char>::lexem_type> parser(std::move(val));
+
     return 0;
 }

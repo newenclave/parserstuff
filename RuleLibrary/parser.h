@@ -4,8 +4,8 @@
 #include <vector>
 
 // Lexemtype:
-//    Lexemtype::IdType some integral type
-//    Lexemtype::IdType Lexemtype::id() -- call to get Id by intance
+//    Lexemtype::id_type some integral type
+//    Lexemtype::id_type Lexemtype::id() -- call to get Id by intance
 
 template <typename NodeT, typename LexemT>
 class parser {
@@ -35,6 +35,14 @@ public:
         , current_(lexem_.begin())
         , next_(lexem_.begin())
     {
+        advance();
+    }
+
+    void reset(std::vector<lexem_type> lexem)
+    {
+        lexem_ = std::move(lexem);
+        current_ = lexem_.begin();
+        next_ = lexem_.begin();
         advance();
     }
 

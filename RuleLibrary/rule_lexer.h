@@ -9,16 +9,16 @@
 
 template <typename CharT, typename LessType = std::less<CharT>>
 class rule_lexer {
+public:
     using lexem_type = rule_lexem<CharT, LessType>;
     using string_type = std::basic_string<CharT>;
     using iterator = typename string_type::const_iterator;
     using lexer_type = lexer<string_type, lexem_type>;
 
-public:
     using id_type = typename lexem_type::id_type;
 
     class internal_state {
-	private:
+    private:
         friend class rule_lexer;
         iterator current;
     };
