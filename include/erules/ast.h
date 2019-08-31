@@ -2,8 +2,8 @@
 #include <memory>
 #include <string>
 
-#include "constants.h"
-#include "helpers.h"
+#include "erules/constants.h"
+#include "erules/helpers.h"
 
 namespace ast {
 
@@ -47,10 +47,11 @@ private:
 template <typename CharT>
 class string : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using string_type = typename node<CharT>::string_type;
     string(string_type val)
-        : node(node_type::STRING)
-        , value(std::move(val))
+        : super_type(node_type::STRING)
+        , value_(std::move(val))
     {
     }
     const string_type& value() const
@@ -69,10 +70,11 @@ private:
 template <typename CharT>
 class floating : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using string_type = typename node<CharT>::string_type;
     floating(double val)
-        : node(node_type::FLOAT)
-        , value(val)
+        : super_type(node_type::FLOAT)
+        , value_(val)
     {
     }
 
@@ -95,9 +97,10 @@ private:
 template <typename CharT>
 class number : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using string_type = typename node<CharT>::string_type;
     number(std::int64_t val)
-        : node<CharT>(node_type::NUMBER)
+        : super_type(node_type::NUMBER)
         , value_(val)
     {
     }
@@ -121,10 +124,11 @@ private:
 template <typename CharT>
 class boolean : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using string_type = typename node<CharT>::string_type;
     boolean(bool val)
-        : node(node_type::BOOLEAN)
-        , value(val)
+        : super_type(node_type::BOOLEAN)
+        , value_(val)
     {
     }
 
@@ -146,12 +150,13 @@ private:
 template <typename CharT>
 class operator_node : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using node_uptr = typename node<CharT>::uptr;
     using string_type = typename node<CharT>::string_type;
     using stream_type = std::basic_stringstream<CharT>;
     operator_node(constants::token_type operation, node_uptr left,
                   node_uptr right)
-        : node(node_type::OPERATOR)
+        : super_type(node_type::OPERATOR)
         , left_(std::move(left))
         , right_(std::move(right))
     {
@@ -171,7 +176,7 @@ public:
     {
         stream_type sss;
         sss << '(' << left_->to_string() << ' '
-            << constants::token_to_string(operation_) << ' '
+            << constants::token_to_string<CharT>(operation_) << ' '
             << right_->to_string() << ')';
         return sss.str();
     }
@@ -185,12 +190,13 @@ private:
 template <typename CharT>
 class prefix_operator : public node<CharT> {
 public:
+    using super_type = node<CharT>;
     using node_uptr = typename node<CharT>::uptr;
     using string_type = typename node<CharT>::string_type;
     using stream_type = std::basic_stringstream<CharT>;
 
     prefix_operator(constants::token_type operation, node_uptr right)
-        : node(node_type::PREFIX_OPERATOR)
+        : super_type(node_type::PREFIX_OPERATOR)
     {
     }
 
@@ -202,7 +208,7 @@ public:
     string_type to_string() const override
     {
         stream_type sss;
-        sss << '(' << constants::token_to_string(operation_) << ' '
+        sss << '(' << constants::token_to_string<CharT>(operation_) << ' '
             << right_->to_string() << ')';
         return sss.str();
     }

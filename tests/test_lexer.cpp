@@ -1,10 +1,10 @@
-#include "pch.h"
 
-#include "lexer.h"
+
 #include <iostream>
 #include <vector>
+#include "erules/lexer.h"
 
-std::string operator""_s(const char* data, std::size_t length)
+std::string operator""_s(const char* data, std::size_t )
 {
     return data;
 }
@@ -38,7 +38,7 @@ void test_01()
 {
     std::string test_input = R"(12312312344444)";
 
-    MyLexer lex([&test_input]() { return LexerState{ 0 }; });
+    MyLexer lex([&]() { return LexerState{ 0 }; });
 
     lex.add_factory("123", createFactory(123));
     lex.add_factory("123123", createFactory(123123));
