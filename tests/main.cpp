@@ -1,15 +1,12 @@
-// RuleLibrary.cpp : This file contains the 'main' function. Program execution
-// begins and ends there.
-//
-#include "pch.h"
+
 #include <iostream>
 
-#include "ast.h"
-#include "helpers.h"
-#include "lexer.h"
-#include "parser.h"
-#include "rule_lexer.h"
-#include "rule_parser.h"
+#include "erules/ast.h"
+#include "erules/helpers.h"
+#include "erules/lexer.h"
+#include "erules/parser.h"
+#include "erules/rule_lexer.h"
+#include "erules/rule_parser.h"
 
 namespace test_lexer {
 void run();
