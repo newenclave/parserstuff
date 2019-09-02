@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include "erules/helpers.h"
+#include <string>
 
 namespace constants {
 enum class token_type : int {

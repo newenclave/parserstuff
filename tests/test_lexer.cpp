@@ -1,10 +1,10 @@
 
 
+#include "erules/lexer.h"
 #include <iostream>
 #include <vector>
-#include "erules/lexer.h"
 
-std::string operator""_s(const char* data, std::size_t )
+std::string operator""_s(const char* data, std::size_t)
 {
     return data;
 }

@@ -1,21 +1,24 @@
+#include "erules/objects.h"
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <memory>
-#include <functional>
-#include "erules/objects.h"
 
 
 using namespace erules;
 namespace test_objects {
 
-class erules_define_object(test1) {
-} ;
+class erules_define_object(test1){
+    public : test1() : typed_object<test1>(__func__){}
+};
 
-class erules_define_object(test2) {
-} ;
+class erules_define_object(test2){
+    public : test2() : typed_object<test2>(__func__){}
+};
 
-class erules_define_object(test3) {
-} ;
+class erules_define_object(test3){
+    public : test3() : typed_object<test3>(__func__){}
+};
 
 void run()
 {
@@ -25,8 +28,9 @@ void run()
 
     object::info::create<test1>();
 
-    std::cout << object::cast<test2>(&t1)->get_info()->id << "\n";
-    std::cout << t2.get_info()->id << "\n";
-    std::cout << t3.get_info()->id << "\n";
+    std::cout << object::cast<test1>(&t1)->type_info()->id << "\n";
+    std::cout << t2.type_info()->id << "\n";
+    std::cout << t3.type_info()->id << "\n";
+    std::cout << t3.type_info()->id << "\n";
 }
 }
