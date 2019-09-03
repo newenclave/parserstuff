@@ -10,13 +10,12 @@ public:
     using char_type = CharT;
     using string_type = std::basic_string<char_type>;
     using less_type = LessType;
+    using id_type = constants::token_type;
 
     struct position_type {
         std::size_t line = 0;
         std::size_t pos = 0;
     };
-
-    using id_type = constants::token_type;
 
     rule_lexem(position_type pos)
         : position_(pos)

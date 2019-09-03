@@ -167,6 +167,10 @@ private:
     std::string type_name_;
 };
 
+using object_binary_operation
+    = std::function<object::uptr(object::ptr, object::ptr)>;
+using object_unary_operation = std::function<object::uptr(object::ptr)>;
+
 // clang-format off
 #define erules_define_object(type_name) \
     type_name: public typed_object<type_name>
@@ -257,6 +261,33 @@ private:
     double value_ = 0;
 };
 
+class erules_define_object(boolean)
+{
+    using super_type = typed_object<boolean>;
+
+public:
+    boolean(bool val)
+        : super_type(__func__)
+    {
+    }
+    boolean()
+        : super_type(__func__)
+    {
+    }
+
+    bool value() const
+    {
+        return value_;
+    }
+
+    object::uptr clone() const override
+    {
+        return std::make_unique<floating>(value());
+    }
+
+private:
+    bool value_ = 0;
+};
 
 inline bool operator<(const object::info::holder& lh,
                       const object::info::holder& rh)

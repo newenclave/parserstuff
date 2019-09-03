@@ -10,7 +10,7 @@ class rule_parser {
 public:
     using lexem_type = LexemT;
     using char_type = typename lexem_type::char_type;
-    using parser_type = parser<typename erules::object::uptr, lexem_type>;
+    using parser_type = parser<erules::ast::node::uptr, lexem_type>;
     using stream_type = std::basic_stringstream<char_type>;
 
     rule_parser(rule_parser&&) = delete;
