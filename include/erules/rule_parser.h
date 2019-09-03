@@ -81,7 +81,8 @@ public:
 
     node_uptr parse()
     {
-        return parser_.parse_expression((int)constants::precedence_type::LOWEST);
+        return parser_.parse_expression(
+                    static_cast<int>(constants::precedence_type::LOWEST));
     }
 
 private:
@@ -100,7 +101,8 @@ private:
             return std::make_unique<erules::ast::ident<lexem_type>>(value);
         });
         auto prefix_operation = [this]() {
-            auto precedence = static_cast<int>(constants::precedence_type::PREFIX);
+            auto precedence =
+                    static_cast<int>(constants::precedence_type::PREFIX);
             auto operation = parser_.current();
             return std::make_unique<erules::ast::prefix_operation<lexem_type> >
                     (operation, parser_.parse_expression(precedence));
