@@ -46,26 +46,22 @@ public:
         advance();
     }
 
-    template <typename CallT>
-    void set_led(id_type id, CallT call)
+    void set_led(id_type id, led_call_type call)
     {
         leds_[id] = std::move(call);
     }
 
-    template <typename CallT>
-    void set_nud(id_type id, CallT call)
+    void set_nud(id_type id, nud_call_type call)
     {
         nuds_[id] = std::move(call);
     }
 
-    template <typename CallT>
-    void set_default_nud(CallT call)
+    void set_default_nud(nud_call_type call)
     {
         default_nud_ = std::move(call);
     }
 
-    template <typename CallT>
-    void set_default_led(CallT call)
+    void set_default_led(led_call_type call)
     {
         default_led_ = std::move(call);
     }
@@ -92,7 +88,7 @@ public:
         int pp = next_precednse();
         lexem_type pt = next();
         while (p < pp) {
-            auto led_call
+            led_call_type led_call
                 = [this](auto left) { return default_led(std::move(left)); };
 
             auto led = leds_.find(lexem_type::id(pt));

@@ -43,9 +43,8 @@ public:
         private:
             const info* info_;
         };
-        info(std::function<object::uptr()> f, std::uintptr_t i)
+        info(std::uintptr_t i)
             : id(i)
-            , factory_(std::move(f))
         {
         }
 
@@ -60,10 +59,9 @@ public:
             static_assert(std::is_base_of<object, T>::value,
                           "T must derive from 'object'");
             static std::uintptr_t localid = 0xFFEEBBAA;
-            static info sinfo{
-                []() { return std::make_unique<T>(); },
-                reinterpret_cast<std::uintptr_t>(&localid),
-            };
+            static info sinfo(
+                reinterpret_cast<std::uintptr_t>(&localid)
+            );
             return holder{ &sinfo };
         }
         std::uintptr_t id = 0;

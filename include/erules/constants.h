@@ -15,6 +15,11 @@ enum class token_type : int {
     NOT,
     NOTEQ,
     IN,
+    MINUS,
+    PLUS,
+    MUL,
+    DIV,
+    MOD,
 
     IDENT,
     NUMBER,
@@ -42,6 +47,16 @@ inline std::basic_string<CharT> token_to_string(token_type t)
         return helpers::strings::to_string<CharT>("and");
     case constants::token_type::OR:
         return helpers::strings::to_string<CharT>("or");
+    case constants::token_type::PLUS:
+        return helpers::strings::to_string<CharT>("+");
+    case constants::token_type::MINUS:
+        return helpers::strings::to_string<CharT>("-");
+    case constants::token_type::MUL:
+        return helpers::strings::to_string<CharT>("*");
+    case constants::token_type::DIV:
+        return helpers::strings::to_string<CharT>("/");
+    case constants::token_type::MOD:
+        return helpers::strings::to_string<CharT>("%");
     case constants::token_type::EQ:
         return helpers::strings::to_string<CharT>("==");
     case constants::token_type::LT:
@@ -88,11 +103,13 @@ inline std::basic_string<CharT> token_to_string(token_type t)
 
 enum class precedence_type : int {
     LOWEST = -1,
-    LOR = 1,
-    LAND = 2,
-    CMP = 3,
-    IN = 4,
-    PAREN = 10,
-    PREFIX = 100,
+    SUM,
+    MUL,
+    LOR,
+    LAND,
+    CMP,
+    IN,
+    PAREN,
+    PREFIX,
 };
 }

@@ -50,7 +50,40 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_unique<ident<LexemType>>(this->lexem());
+            return nullptr;
+            //return std::make_unique<ident<LexemType>>(this->lexem());
+        }
+    };
+
+    template <typename LexemType>
+    class number: public node<LexemType> {
+        using super_type = node<LexemType>;
+    public:
+        number(LexemType lex)
+            : super_type(object::info::create<number>(), __func__,
+                         std::move(lex))
+        { }
+
+        object::uptr clone() const override
+        {
+            return nullptr;
+            //return std::make_unique<number<LexemType>>(this->lexem());
+        }
+    };
+
+    template <typename LexemType>
+    class floating: public node<LexemType> {
+        using super_type = node<LexemType>;
+    public:
+        floating(LexemType lex)
+            : super_type(object::info::create<floating>(), __func__,
+                         std::move(lex))
+        { }
+
+        object::uptr clone() const override
+        {
+            return nullptr;
+            //return std::make_unique<floating<LexemType>>(this->lexem());
         }
     };
 
@@ -71,8 +104,9 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_unique<binary_operation<LexemType>>(
-                this->lexem(), left_->clone(), right_->clone());
+            return nullptr;
+//            return std::make_unique<binary_operation<LexemType>>(
+//                this->lexem(), left_->clone(), right_->clone());
         }
 
     private:
@@ -96,8 +130,8 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_unique<prefix_operation<LexemType> >(
-                this->lexem(), value_->clone());
+            return nullptr;
+            //return std::make_unique<this_type>(this->lexem(), value_->clone());
         }
 
     private:
@@ -119,8 +153,9 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_unique<postfix_operation<LexemType>>(
-                this->lexem(), value_->clone());
+            return nullptr;
+//            return std::make_unique<postfix_operation<LexemType>>(
+//                this->lexem(), value_->clone());
         }
 
     private:
@@ -143,14 +178,15 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            sequence_container cont;
-            cont.reserve(container_.size());
-            for (auto& v : container_)
-            {
-                cont->emplace_back(v->clone());
-            }
-            return std::make_unique<sequence<LexemType>>(
-                         this->lexem(), std::move(cont));
+            return nullptr;
+//            sequence_container cont;
+//            cont.reserve(container_.size());
+//            for (auto& v : container_)
+//            {
+//                cont->emplace_back(v->clone());
+//            }
+//            return std::make_unique<sequence<LexemType>>(
+//                         this->lexem(), std::move(cont));
         }
 
     private:

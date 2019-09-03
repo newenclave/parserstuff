@@ -3,34 +3,26 @@
 #include <vector>
 
 #include "erules/parser.h"
+#include "erules/rule_parser.h"
+#include "erules/rule_lexem.h"
+#include "erules/rule_lexer.h"
 
-struct TestState {
-    using id_type = int;
-    static id_type id(const TestState& state)
-    {
-        return state.id_;
-    }
-    int id_;
-};
-
-struct TestNode {
-    int id;
-};
-
-using TestParser = parser<TestNode, TestState>;
+using mlexer = rule_lexer<char>;
+using mparser = rule_parser<typename mlexer::lexem_type>;
 
 namespace test_parser {
 void run()
 {
-    std::vector<TestState> lex = { { 1 }, { 1 }, { 2 }, { 2 }, { 4 } };
-    TestParser parser(lex);
-    parser.advance();
-    parser.advance();
-    std::cout << "2=" << parser.current().id_ << "\n";
-    auto state = parser.store();
-    parser.advance();
-    parser.advance();
-    parser.restore(state);
-    std::cout << "2=" << parser.current().id_ << "\n";
+    std::string val = "a + a * a";
+    mlexer lex;
+    lex.reset(val);
+    auto tokens = lex.read_all(val);
+
+    for(auto &t: tokens){
+        std::cout << t.raw_value() << "\n";
+    }
+    mparser pars(std::move(tokens));
+    auto n = pars.parse();
+    std::cout << n->type_name() << "\n";
 }
 }
