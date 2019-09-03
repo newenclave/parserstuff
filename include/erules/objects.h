@@ -77,11 +77,6 @@ public:
     {
     }
 
-    object()
-        : info_(info::create<object>())
-    {
-    }
-
     virtual ~object() = default;
 
     template <typename ToT>
@@ -135,6 +130,8 @@ public:
         return "object";
     }
 
+    virtual uptr clone() const = 0;
+
 protected:
     template <typename T>
     static void assert_type(object::cptr p)
@@ -161,24 +158,105 @@ public:
     typed_object(const typed_object&) = default;
     typed_object& operator=(const typed_object&) = default;
 
-    virtual const char* type_name() const override
+    const char* type_name() const override
     {
         return type_name_.c_str();
-    }
-
-    std::unique_ptr<T> create_empty() const
-    {
-        return object::cast<T>(object::info::create<T>()->create());
     }
 
 private:
     std::string type_name_;
 };
 
-#define erules_define_object(type_name)                                        \
-    type_name:                                                                 \
-public                                                                         \
-    typed_object<type_name>
+// clang-format off
+#define erules_define_object(type_name) \
+    type_name: public typed_object<type_name>
+
+#define erules_define_template_object(type_name, ...) \
+    type_name: public typed_object<type_name<__VA_ARGS__> >
+// clang-format on
+
+template <typename CharT>
+class erules_define_template_object(string, CharT)
+{
+public:
+    using super_type = typed_object<string<CharT>>;
+    using string_type = std::basic_string<CharT>;
+
+    string(string_type val)
+        : super_type(__func__)
+        , value_(std::move(val))
+    {
+    }
+
+    string()
+        : super_type(__func__)
+    {
+    }
+    const string_type& value() const
+    {
+        return value_;
+    }
+    object::uptr clone() const override
+    {
+        return std::make_unique<string<CharT>>(value());
+    }
+
+private:
+    string_type value_;
+};
+
+class erules_define_object(number)
+{
+    using super_type = typed_object<number>;
+
+public:
+    number(std::uint64_t val)
+        : super_type(__func__)
+    {
+    }
+    number()
+        : super_type(__func__)
+    {
+    }
+    std::int64_t value() const
+    {
+        return value_;
+    }
+    object::uptr clone() const override
+    {
+        return std::make_unique<number>(value());
+    }
+
+private:
+    std::int64_t value_ = 0;
+};
+
+class erules_define_object(floating)
+{
+    using super_type = typed_object<floating>;
+
+public:
+    floating(double val)
+        : super_type(__func__)
+    {
+    }
+    floating()
+        : super_type(__func__)
+    {
+    }
+    double value() const
+    {
+        return value_;
+    }
+    object::uptr clone() const override
+    {
+        return std::make_unique<floating>(value());
+    }
+
+private:
+    double value_ = 0;
+};
+
 
 inline bool operator<(const object::info::holder& lh,
                       const object::info::holder& rh)
