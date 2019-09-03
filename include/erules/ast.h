@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "erules/constants.h"
 #include "erules/helpers.h"
@@ -49,16 +50,18 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_shared<ident<CharT>>(lexem());
+            return std::make_unique<ident<LexemType>>(this->lexem());
         }
     };
 
     template <typename LexemType>
     class binary_operation : public node<LexemType> {
-        using super_type = binary_operation<LexemType>;
+        using super_type = node<LexemType>;
+        using this_type = binary_operation<LexemType>;
+        using node_uptr = typename super_type::uptr;
 
     public:
-        binary_operation(LexemType lex, node::uptr left, node::uptr right)
+        binary_operation(LexemType lex, node_uptr left, node_uptr right)
             : super_type(object::info::create<binary_operation>(), __func__,
                          std::move(lex))
             , left_(std::move(left))
@@ -68,65 +71,69 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_shared<binary_operation<LexemType>>(
-                lexem(), left_->clone(), right_->clone());
+            return std::make_unique<binary_operation<LexemType>>(
+                this->lexem(), left_->clone(), right_->clone());
         }
 
     private:
-        node::uptr left_;
-        node::uptr right_;
+        node_uptr left_;
+        node_uptr right_;
     };
 
     template <typename LexemType>
     class prefix_operation : public node<LexemType> {
-        using super_type = prefix_operation<LexemType>;
+        using super_type = node<LexemType>;
+        using this_type = prefix_operation<LexemType>;
+        using node_uptr = typename super_type::uptr;
 
     public:
-        prefix_operation(LexemType lex, node::uptr value)
+        prefix_operation(LexemType lex, node_uptr value)
             : super_type(object::info::create<prefix_operation>(), __func__,
                          std::move(lex))
-            , value_(std::move(left))
+            , value_(std::move(value))
         {
         }
 
         object::uptr clone() const override
         {
-            return std::make_shared<prefix_operation<LexemType>>(
-                lexem(), value_->clone());
+            return std::make_unique<prefix_operation<LexemType> >(
+                this->lexem(), value_->clone());
         }
 
     private:
-        node::uptr value_;
+        node_uptr value_;
     };
 
     template <typename LexemType>
     class postfix_operation : public node<LexemType> {
-        using super_type = postfix_operation<LexemType>;
-
+        using super_type = node<LexemType>;
+        using this_type = postfix_operation<LexemType>;
+        using node_uptr = typename super_type::uptr;
     public:
-        postfix_operation(LexemType lex, node::uptr value)
+        postfix_operation(LexemType lex, node_uptr value)
             : super_type(object::info::create<postfix_operation>(), __func__,
                          std::move(lex))
-            , value_(std::move(left))
+            , value_(std::move(value))
         {
         }
 
         object::uptr clone() const override
         {
-            return std::make_shared<postfix_operation<LexemType>>(
-                lexem(), value_->clone());
+            return std::make_unique<postfix_operation<LexemType>>(
+                this->lexem(), value_->clone());
         }
 
     private:
-        node::uptr value_;
+        node_uptr value_;
     };
 
     template <typename LexemType>
     class sequence : public node<LexemType> {
-        using super_type = postfix_operation<LexemType>;
+        using super_type = node<LexemType>;
+        using node_uptr = typename super_type::uptr;
 
     public:
-        using sequence_container = std::vector<node<LexemType>::uptr>;
+        using sequence_container = std::vector<node_uptr>;
         sequence(LexemType lex, sequence_container container)
             : super_type(object::info::create<sequence_container>(), __func__,
                          std::move(lex))
@@ -137,12 +144,13 @@ namespace erules { namespace ast {
         object::uptr clone() const override
         {
             sequence_container cont;
-            cont.reserve(container_.size()) for (auto& v : container_)
+            cont.reserve(container_.size());
+            for (auto& v : container_)
             {
-                cont->emplace_back(v->clone())
+                cont->emplace_back(v->clone());
             }
-            return std::make_shared<sequence<LexemType>>(lexem(),
-                                                         std::move(cont));
+            return std::make_unique<sequence<LexemType>>(
+                         this->lexem(), std::move(cont));
         }
 
     private:
