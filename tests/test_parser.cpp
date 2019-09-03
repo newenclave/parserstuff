@@ -13,7 +13,7 @@ using mparser = rule_parser<typename mlexer::lexem_type>;
 namespace test_parser {
 void run()
 {
-    std::string val = "a + a * a";
+    std::string val = "(a + a) * a";
     mlexer lex;
     lex.reset(val);
     auto tokens = lex.read_all(val);
@@ -23,6 +23,6 @@ void run()
     }
     mparser pars(std::move(tokens));
     auto n = pars.parse();
-    std::cout << n->type_name() << "\n";
+    std::cout << n->str() << "\n";
 }
 }

@@ -32,6 +32,7 @@ namespace erules { namespace ast {
             return lexem_;
         }
 
+        virtual std::string str() const = 0;
     private:
         std::string name_;
         LexemType lexem_;
@@ -53,6 +54,10 @@ namespace erules { namespace ast {
             return nullptr;
             //return std::make_unique<ident<LexemType>>(this->lexem());
         }
+        std::string str() const override
+        {
+            return this->lexem().raw_value();
+        }
     };
 
     template <typename LexemType>
@@ -69,6 +74,11 @@ namespace erules { namespace ast {
             return nullptr;
             //return std::make_unique<number<LexemType>>(this->lexem());
         }
+        std::string str() const override
+        {
+            return this->lexem().raw_value();
+        }
+
     };
 
     template <typename LexemType>
@@ -85,6 +95,11 @@ namespace erules { namespace ast {
             return nullptr;
             //return std::make_unique<floating<LexemType>>(this->lexem());
         }
+        std::string str() const override
+        {
+            return this->lexem().raw_value();
+        }
+
     };
 
     template <typename LexemType>
@@ -107,6 +122,11 @@ namespace erules { namespace ast {
             return nullptr;
 //            return std::make_unique<binary_operation<LexemType>>(
 //                this->lexem(), left_->clone(), right_->clone());
+        }
+        std::string str() const override
+        {
+            return "(" + left_->str() + this->lexem().raw_value() +
+                    right_->str() + ")";
         }
 
     private:
@@ -133,6 +153,10 @@ namespace erules { namespace ast {
             return nullptr;
             //return std::make_unique<this_type>(this->lexem(), value_->clone());
         }
+        std::string str() const override
+        {
+            return "(" + this->lexem().raw_value() + value_->str() + ")";
+        }
 
     private:
         node_uptr value_;
@@ -156,6 +180,10 @@ namespace erules { namespace ast {
             return nullptr;
 //            return std::make_unique<postfix_operation<LexemType>>(
 //                this->lexem(), value_->clone());
+        }
+        std::string str() const override
+        {
+            return "(" + value_->str() + this->lexem().raw_value() + ")";
         }
 
     private:
@@ -188,7 +216,10 @@ namespace erules { namespace ast {
 //            return std::make_unique<sequence<LexemType>>(
 //                         this->lexem(), std::move(cont));
         }
-
+        std::string str() const override
+        {
+            return "[]";
+        }
     private:
         sequence_container container_;
     };

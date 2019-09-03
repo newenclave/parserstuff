@@ -139,9 +139,7 @@ private:
             parser_.advance();
             auto expr = parser_.parse_expression(
                         static_cast<int>(constants::precedence_type::LOWEST));
-            if(parser_.expect(constants::token_type::RPAREN)) {
-                parser_.advance();
-            }
+            parser_.expect(constants::token_type::RPAREN);
             return expr;
         });
     }
