@@ -8,17 +8,6 @@
 
 namespace erules { namespace ast {
 
-    enum node_type : int {
-        NONE,
-        NUMBER,
-        FLOAT,
-        BOOLEAN,
-        STRING,
-        OPERATOR,
-        PREFIX_OPERATOR,
-        SUFFIX_OPERATOR,
-    };
-
     template <typename LexemType>
     class node : object {
     public:
@@ -60,7 +49,7 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return std::make_shared<ident>(lexem());
+            return std::make_shared<ident<CharT>>(lexem());
         }
     };
 
@@ -130,6 +119,34 @@ namespace erules { namespace ast {
 
     private:
         node::uptr value_;
+    };
+
+    template <typename LexemType>
+    class sequence : public node<LexemType> {
+        using super_type = postfix_operation<LexemType>;
+
+    public:
+        using sequence_container = std::vector<node<LexemType>::uptr>;
+        sequence(LexemType lex, sequence_container container)
+            : super_type(object::info::create<sequence_container>(), __func__,
+                         std::move(lex))
+            , container_(std::move(container))
+        {
+        }
+
+        object::uptr clone() const override
+        {
+            sequence_container cont;
+            cont.reserve(container_.size()) for (auto& v : container_)
+            {
+                cont->emplace_back(v->clone())
+            }
+            return std::make_shared<sequence<LexemType>>(lexem(),
+                                                         std::move(cont));
+        }
+
+    private:
+        sequence_container container_;
     };
 
     class operations {
