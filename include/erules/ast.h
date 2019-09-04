@@ -10,7 +10,7 @@
 namespace erules { namespace ast {
 
     template <typename LexemType>
-    class node : object {
+    class node : public object {
     public:
         using char_type = typename LexemType::char_type;
         using uptr = std::unique_ptr<node>;
@@ -33,6 +33,13 @@ namespace erules { namespace ast {
         }
 
         virtual std::string str() const = 0;
+
+    protected:
+        static uptr to_node(object::uptr p)
+        {
+            return uptr(static_cast<node*>(p.release()));
+        }
+
     private:
         std::string name_;
         LexemType lexem_;
@@ -41,18 +48,18 @@ namespace erules { namespace ast {
     template <typename LexemType>
     class ident : public node<LexemType> {
         using super_type = node<LexemType>;
+        using this_type = ident<LexemType>;
 
     public:
         ident(LexemType lex)
-            : super_type(object::info::create<ident>(), __func__,
+            : super_type(object::info::create<this_type>(), __func__,
                          std::move(lex))
         {
         }
 
         object::uptr clone() const override
         {
-            return nullptr;
-            //return std::make_unique<ident<LexemType>>(this->lexem());
+            return std::make_unique<ident<LexemType>>(this->lexem());
         }
         std::string str() const override
         {
@@ -61,45 +68,67 @@ namespace erules { namespace ast {
     };
 
     template <typename LexemType>
-    class number: public node<LexemType> {
+    class number : public node<LexemType> {
         using super_type = node<LexemType>;
+        using this_type = number<LexemType>;
+
     public:
         number(LexemType lex)
-            : super_type(object::info::create<number>(), __func__,
+            : super_type(object::info::create<this_type>(), __func__,
                          std::move(lex))
-        { }
-
+        {
+        }
         object::uptr clone() const override
         {
-            return nullptr;
-            //return std::make_unique<number<LexemType>>(this->lexem());
+            return std::make_unique<this_type>(this->lexem());
         }
         std::string str() const override
         {
             return this->lexem().raw_value();
         }
-
     };
 
     template <typename LexemType>
-    class floating: public node<LexemType> {
+    class string : public node<LexemType> {
         using super_type = node<LexemType>;
-    public:
-        floating(LexemType lex)
-            : super_type(object::info::create<floating>(), __func__,
-                         std::move(lex))
-        { }
+        using this_type = string<LexemType>;
 
+    public:
+        string(LexemType lex)
+            : super_type(object::info::create<string>(), __func__,
+                         std::move(lex))
+        {
+        }
         object::uptr clone() const override
         {
-            return nullptr;
-            //return std::make_unique<floating<LexemType>>(this->lexem());
+            return std::make_unique<this_type>(this->lexem());
+        }
+        std::string str() const override
+        {
+            return "\"" + this->lexem().value() + "\"";
+        }
+    };
+
+
+    template <typename LexemType>
+    class floating : public node<LexemType> {
+        using super_type = node<LexemType>;
+        using this_type = floating<LexemType>;
+
+    public:
+        floating(LexemType lex)
+            : super_type(object::info::create<this_type>(), __func__,
+                         std::move(lex))
+        {
+        }
+        object::uptr clone() const override
+        {
+            return std::make_unique<this_type>(this->lexem());
         }
         std::string str() const override
         {
             return this->lexem().raw_value();
         }
-
     };
 
     template <typename LexemType>
@@ -109,24 +138,33 @@ namespace erules { namespace ast {
         using node_uptr = typename super_type::uptr;
 
     public:
-        binary_operation(LexemType lex, node_uptr left, node_uptr right)
-            : super_type(object::info::create<binary_operation>(), __func__,
+        binary_operation(LexemType lex, node_uptr lft, node_uptr rght)
+            : super_type(object::info::create<this_type>(), __func__,
                          std::move(lex))
-            , left_(std::move(left))
-            , right_(std::move(right))
+            , left_(std::move(lft))
+            , right_(std::move(rght))
         {
         }
-
         object::uptr clone() const override
         {
-            return nullptr;
-//            return std::make_unique<binary_operation<LexemType>>(
-//                this->lexem(), left_->clone(), right_->clone());
+            return std::make_unique<binary_operation<LexemType>>(
+                this->lexem(), super_type::to_node(left_->clone()),
+                super_type::to_node(right_->clone()));
         }
         std::string str() const override
         {
-            return "(" + left_->str() + this->lexem().raw_value() +
-                    right_->str() + ")";
+            return "(" + left_->str() + this->lexem().raw_value()
+                + right_->str() + ")";
+        }
+
+        const node_uptr& left() const
+        {
+            return left_;
+        }
+
+        const node_uptr& right() const
+        {
+            return right_;
         }
 
     private:
@@ -141,21 +179,26 @@ namespace erules { namespace ast {
         using node_uptr = typename super_type::uptr;
 
     public:
-        prefix_operation(LexemType lex, node_uptr value)
-            : super_type(object::info::create<prefix_operation>(), __func__,
+        prefix_operation(LexemType lex, node_uptr val)
+            : super_type(object::info::create<this_type>(), __func__,
                          std::move(lex))
-            , value_(std::move(value))
+            , value_(std::move(val))
         {
         }
 
         object::uptr clone() const override
         {
-            return nullptr;
-            //return std::make_unique<this_type>(this->lexem(), value_->clone());
+            return std::make_unique<this_type>(
+                this->lexem(), super_type::to_node(value_->clone()));
         }
+
         std::string str() const override
         {
             return "(" + this->lexem().raw_value() + value_->str() + ")";
+        }
+        const node_uptr& value() const
+        {
+            return value_;
         }
 
     private:
@@ -167,6 +210,7 @@ namespace erules { namespace ast {
         using super_type = node<LexemType>;
         using this_type = postfix_operation<LexemType>;
         using node_uptr = typename super_type::uptr;
+
     public:
         postfix_operation(LexemType lex, node_uptr value)
             : super_type(object::info::create<postfix_operation>(), __func__,
@@ -177,9 +221,8 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return nullptr;
-//            return std::make_unique<postfix_operation<LexemType>>(
-//                this->lexem(), value_->clone());
+            return std::make_unique<postfix_operation<LexemType>>(
+                this->lexem(), super_type::to_node(value_->clone()));
         }
         std::string str() const override
         {
@@ -206,20 +249,19 @@ namespace erules { namespace ast {
 
         object::uptr clone() const override
         {
-            return nullptr;
-//            sequence_container cont;
-//            cont.reserve(container_.size());
-//            for (auto& v : container_)
-//            {
-//                cont->emplace_back(v->clone());
-//            }
-//            return std::make_unique<sequence<LexemType>>(
-//                         this->lexem(), std::move(cont));
+            sequence_container cont;
+            cont.reserve(container_.size());
+            for (auto& v : container_) {
+                cont->emplace_back(v->clone());
+            }
+            return std::make_unique<sequence<LexemType>>(this->lexem(),
+                                                         std::move(cont));
         }
         std::string str() const override
         {
             return "[]";
         }
+
     private:
         sequence_container container_;
     };

@@ -82,7 +82,7 @@ public:
     node_uptr parse()
     {
         return parser_.parse_expression(
-                    static_cast<int>(constants::precedence_type::LOWEST));
+            static_cast<int>(constants::precedence_type::LOWEST));
     }
 
 private:
@@ -101,11 +101,12 @@ private:
             return std::make_unique<erules::ast::ident<lexem_type>>(value);
         });
         auto prefix_operation = [this]() {
-            auto precedence =
-                    static_cast<int>(constants::precedence_type::PREFIX);
+            auto precedence
+                = static_cast<int>(constants::precedence_type::PREFIX);
             auto operation = parser_.current();
-            return std::make_unique<erules::ast::prefix_operation<lexem_type> >
-                    (operation, parser_.parse_expression(precedence));
+            parser_.advance();
+            return std::make_unique<erules::ast::prefix_operation<lexem_type>>(
+                operation, parser_.parse_expression(precedence));
         };
         parser_.set_nud(constants::token_type::NOT, prefix_operation);
         parser_.set_nud(constants::token_type::MINUS, prefix_operation);
@@ -116,8 +117,8 @@ private:
             auto pp = parser_.current_precednse();
             parser_.advance();
             auto right = parser_.parse_expression(pp);
-            return std::make_unique<erules::ast::binary_operation<lexem_type> >
-                (std::move(current), std::move(left), std::move(right));
+            return std::make_unique<erules::ast::binary_operation<lexem_type>>(
+                std::move(current), std::move(left), std::move(right));
         };
 
         parser_.set_led(constants::token_type::PLUS, binary_operation);
@@ -135,10 +136,10 @@ private:
         parser_.set_led(constants::token_type::GEQ, binary_operation);
         parser_.set_led(constants::token_type::LEQ, binary_operation);
 
-        parser_.set_nud(constants::token_type::LPAREN, [this](){
+        parser_.set_nud(constants::token_type::LPAREN, [this]() {
             parser_.advance();
             auto expr = parser_.parse_expression(
-                        static_cast<int>(constants::precedence_type::LOWEST));
+                static_cast<int>(constants::precedence_type::LOWEST));
             parser_.expect(constants::token_type::RPAREN);
             return expr;
         });

@@ -86,7 +86,6 @@ public:
     }
 
 private:
-
     void fill_readers()
     {
         lexer_.add_factory(make_name("\""),
@@ -139,7 +138,6 @@ private:
                            create_token(constants::token_type::DIV));
         lexer_.add_factory(make_name("%"),
                            create_token(constants::token_type::MOD));
-
     }
 
     using token_state_factory = typename lexer_type::token_state_factory;
@@ -233,6 +231,7 @@ private:
         auto begin = current_;
         current_ = helpers::reader::read_ident(current_, end_);
         state.set_raw_value(string_type{ begin, current_ });
+        state.set_value(string_type{ begin, current_ });
         state.set_token(constants::token_type::IDENT);
         return state;
     }

@@ -59,9 +59,7 @@ public:
             static_assert(std::is_base_of<object, T>::value,
                           "T must derive from 'object'");
             static std::uintptr_t localid = 0xFFEEBBAA;
-            static info sinfo(
-                reinterpret_cast<std::uintptr_t>(&localid)
-            );
+            static info sinfo(reinterpret_cast<std::uintptr_t>(&localid));
             return holder{ &sinfo };
         }
         std::uintptr_t id = 0;
