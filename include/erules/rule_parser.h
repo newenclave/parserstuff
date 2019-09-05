@@ -65,6 +65,13 @@ public:
             static_cast<int>(constants::precedence_type::MUL));
 
         parser_.set_precedense(
+            constants::token_type::DOT,
+            static_cast<int>(constants::precedence_type::DOT));
+        parser_.set_precedense(
+            constants::token_type::DOTDOT,
+            static_cast<int>(constants::precedence_type::DOTDOT));
+
+        parser_.set_precedense(
             constants::token_type::IN,
             static_cast<int>(constants::precedence_type::IN));
         parser_.set_precedense(
@@ -126,6 +133,9 @@ private:
         parser_.set_led(constants::token_type::MUL, binary_operation);
         parser_.set_led(constants::token_type::DIV, binary_operation);
         parser_.set_led(constants::token_type::MOD, binary_operation);
+
+        parser_.set_led(constants::token_type::DOT, binary_operation);
+        parser_.set_led(constants::token_type::DOTDOT, binary_operation);
 
         parser_.set_led(constants::token_type::EQ, binary_operation);
         parser_.set_led(constants::token_type::NOTEQ, binary_operation);

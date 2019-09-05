@@ -138,6 +138,11 @@ private:
                            create_token(constants::token_type::DIV));
         lexer_.add_factory(make_name("%"),
                            create_token(constants::token_type::MOD));
+
+        lexer_.add_factory(make_name("."),
+                           create_token(constants::token_type::DOT));
+        lexer_.add_factory(make_name(".."),
+                           create_token(constants::token_type::DOTDOT));
     }
 
     using token_state_factory = typename lexer_type::token_state_factory;

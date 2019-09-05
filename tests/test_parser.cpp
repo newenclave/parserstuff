@@ -13,7 +13,7 @@ using mparser = rule_parser<typename mlexer::lexem_type>;
 namespace test_parser {
 void run()
 {
-    std::string val = "-([and] - a + a) * 2";
+    std::string val = "a.b.x";
     mlexer lex;
     lex.reset(val);
     auto tokens = lex.read_all(val);
