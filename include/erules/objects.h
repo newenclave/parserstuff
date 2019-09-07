@@ -163,6 +163,150 @@ private:
     std::string type_name_;
 };
 
+template <typename IdType>
+class object_binary_operations {
+public:
+    using id_type = IdType;
+
+    using function_type = std::function<object::uptr(object::ptr, object::ptr)>;
+    using index_type = std::tuple<
+        id_type,
+        object::info::holder,
+        object::info::holder
+    >;
+    using map_type = std::map<index_type, function_type>;
+
+private:
+    template <typename LeftT, typename RightT, typename CallT>
+    static function_type create_call(CallT call)
+    {
+        return [call](auto left, auto right) {
+            return call(object::cast<LeftT>(left), object::cast<LeftT>(right));
+        };
+    }
+public:
+    template <typename LeftT, typename RightT, typename CallT>
+    void set(id_type op, CallT call, bool add_revert = false)
+    {
+        if(!std::is_same<LeftT, RightT>::value && add_revert) {
+            set_impl(op,
+                     object::info::create<RightT>(),
+                     object::info::create<LeftT>(),
+                     create_call<RightT, LeftT, CallT>(call));
+        }
+        set_impl(op,
+                 object::info::create<LeftT>(),
+                 object::info::create<RightT>(),
+                 create_call<LeftT, RightT, CallT>(std::move(call)));
+    }
+    object::uptr call(id_type op, object::ptr left, object::ptr right)
+    {
+        auto id = std::make_tuple(op, left->type_info(), right->type_info());
+        auto find = bin_map_.find(id);
+        if(find != bin_map_.end()) {
+            return find->second(left, right);
+        }
+        return {};
+    }
+private:
+    void set_impl(id_type op,
+                  object::info::holder left_type,
+                  object::info::holder right_type,
+                  function_type call)
+    {
+        bin_map_[std::make_tuple(op, left_type, right_type)] = std::move(call);
+    }
+
+    map_type bin_map_;
+};
+
+template <typename IdType>
+class object_unary_operations {
+public:
+    using id_type = IdType;
+    using function_type = std::function<object::uptr(object::ptr)>;
+    using index_type = std::tuple<id_type, object::info::holder>;
+    using map_type = std::map<index_type, function_type>;
+private:
+    template <typename ValueT, typename CallT>
+    static function_type create_call(CallT call)
+    {
+        return [call](auto obj) {
+            return call(object::cast<ValueT>(obj));
+        };
+    }
+public:
+    template <typename ValueT, typename CallT>
+    void set(id_type op, CallT call)
+    {
+        set_impl(op, object::info::create<ValueT>(),
+                 create_call<ValueT, CallT>(std::move(call)));
+    }
+
+    object::uptr call(id_type op, object::ptr value)
+    {
+        auto id = std::make_tuple(op, value->type_info());
+        auto find = un_map_.find(id);
+        if(find != un_map_.end()) {
+            return find->second(value);
+        }
+        return {};
+    }
+private:
+    void set_impl(id_type op,
+                  object::info::holder value_type,
+                  function_type call)
+    {
+        un_map_[std::make_tuple(op, value_type)] = std::move(call);
+    }
+private:
+    map_type un_map_;
+};
+
+template <typename IdType>
+class object_transform_operations {
+public:
+    using id_type = IdType;
+    using function_type = std::function<object::uptr(object::ptr)>;
+    using index_type = std::tuple<object::info::holder, object::info::holder>;
+    using map_type = std::map<index_type, function_type >;
+private:
+    template <typename ValueT, typename CallT>
+    static function_type create_unary_call(CallT call)
+    {
+        return [call](auto obj) {
+            return call(object::cast<ValueT>(obj));
+        };
+    }
+public:
+    template <typename FromT, typename ToT, typename CallT>
+    void set(CallT call)
+    {
+        set_impl(object::info::create<FromT>(),
+                 object::info::create<ToT>(),
+                 create_unary_call<FromT>(std::move(call)));
+    }
+
+    template <typename ToT>
+    std::unique_ptr<ToT> call(object::ptr value)
+    {
+        auto id = std::make_tuple(value->type_info(),
+                                  object::info::create<ToT>());
+        auto find = trans_map_.find(id);
+        if(find != trans_map_.end()) {
+            return object::cast<ToT>(find->second(value));
+        }
+        return {};
+    }
+private:
+    void set_impl(object::info::holder from_type,
+                  object::info::holder to_type,
+                  function_type call)
+    {
+        trans_map_[std::make_tuple(from_type, to_type)] = std::move(call);
+    }
+    map_type trans_map_;
+};
 
 template <typename IdType>
 class object_operations {
