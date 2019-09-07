@@ -163,6 +163,14 @@ private:
     std::string type_name_;
 };
 
+// clang-format off
+#define erules_define_object(type_name) \
+    type_name: public typed_object<type_name>
+
+#define erules_define_template_object(type_name, ...) \
+    type_name: public typed_object<type_name<__VA_ARGS__> >
+// clang-format on
+
 template <typename IdType>
 class object_binary_operations {
 public:
@@ -451,13 +459,6 @@ private:
     transform_operation_map trans_map_;
 };
 
-// clang-format off
-#define erules_define_object(type_name) \
-    type_name: public typed_object<type_name>
-
-#define erules_define_template_object(type_name, ...) \
-    type_name: public typed_object<type_name<__VA_ARGS__> >
-// clang-format on
 
 template <typename CharT>
 class erules_define_template_object(string, CharT)

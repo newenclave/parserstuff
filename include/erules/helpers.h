@@ -27,12 +27,17 @@ struct reader {
 
     static bool is_digit(char c)
     {
-        return ('0' <= c && c <= '9') || c == '_';
+        return ('0' <= c && c <= '9');
+    }
+
+    static bool is_digit_(char c)
+    {
+        return is_digit(c) || c == '_';
     }
 
     static bool is_ident(char c)
     {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || is_digit(c);
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || is_digit_(c);
     }
 
     template <typename CharT>
@@ -69,7 +74,7 @@ struct reader {
     template <typename Itr>
     static Itr read_number(Itr begin, Itr end)
     {
-        return std::find_if_not(begin, end, [](auto c) { return is_digit(c); });
+        return std::find_if_not(begin, end, [](auto c) { return is_digit_(c); });
     }
 
     template <typename Itr, typename Itr2>

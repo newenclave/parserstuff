@@ -44,7 +44,7 @@ void run()
                         right->value() + ')');
         });
 
-    std::string val = "a + 2 * 5";
+    std::string val = "a + 2 * _5.89";
     mlexer lex;
     lex.reset(val);
     auto tokens = lex.read_all(val);
