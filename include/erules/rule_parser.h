@@ -95,35 +95,36 @@ public:
 private:
     void fill_parsers()
     {
-        parser_.set_nud(constants::token_type::NUMBER, [this]() {
-            auto value = parser_.current();
-            return std::make_unique<erules::ast::number<lexem_type>>(value);
-        });
-        parser_.set_nud(constants::token_type::FLOAT, [this]() {
-            auto value = parser_.current();
-            return std::make_unique<erules::ast::floating<lexem_type>>(value);
-        });
-        parser_.set_nud(constants::token_type::IDENT, [this]() {
-            auto value = parser_.current();
+        auto parse_value = [](auto parser_ptr) {
+            auto value = parser_ptr->current();
+            return std::make_unique<erules::ast::value<lexem_type> >(value);
+        };
+        parser_.set_nud(constants::token_type::NUMBER, parse_value);
+        parser_.set_nud(constants::token_type::FLOAT, parse_value);
+        parser_.set_nud(constants::token_type::STRING, parse_value);
+
+        parser_.set_nud(constants::token_type::IDENT, [](auto parser_ptr) {
+            auto value = parser_ptr->current();
             return std::make_unique<erules::ast::ident<lexem_type>>(value);
         });
-        auto prefix_operation = [this]() {
+
+        auto prefix_operation = [this](auto parser_ptr) {
             auto precedence
                 = static_cast<int>(constants::precedence_type::PREFIX);
-            auto operation = parser_.current();
-            parser_.advance();
+            auto operation = parser_ptr->current();
+            parser_ptr->advance();
             return std::make_unique<erules::ast::prefix_operation<lexem_type>>(
-                operation, parser_.parse_expression(precedence));
+                operation, parser_ptr->parse_expression(precedence));
         };
         parser_.set_nud(constants::token_type::NOT, prefix_operation);
         parser_.set_nud(constants::token_type::MINUS, prefix_operation);
         parser_.set_nud(constants::token_type::PLUS, prefix_operation);
 
-        auto binary_operation = [this](node_uptr left) {
-            auto current = parser_.current();
-            auto pp = parser_.current_precednse();
-            parser_.advance();
-            auto right = parser_.parse_expression(pp);
+        auto binary_operation = [this](auto parser_ptr, node_uptr left) {
+            auto current = parser_ptr->current();
+            auto pp = parser_ptr->current_precednse();
+            parser_ptr->advance();
+            auto right = parser_ptr->parse_expression(pp);
             return std::make_unique<erules::ast::binary_operation<lexem_type>>(
                 std::move(current), std::move(left), std::move(right));
         };
@@ -146,11 +147,11 @@ private:
         parser_.set_led(constants::token_type::GEQ, binary_operation);
         parser_.set_led(constants::token_type::LEQ, binary_operation);
 
-        parser_.set_nud(constants::token_type::LPAREN, [this]() {
+        parser_.set_nud(constants::token_type::LPAREN, [this](auto parser_ptr) {
             parser_.advance();
-            auto expr = parser_.parse_expression(
+            auto expr = parser_ptr->parse_expression(
                 static_cast<int>(constants::precedence_type::LOWEST));
-            parser_.expect(constants::token_type::RPAREN);
+            parser_ptr->expect(constants::token_type::RPAREN);
             return expr;
         });
     }

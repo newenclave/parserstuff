@@ -33,8 +33,6 @@ namespace erules { namespace ast {
             return lexem_;
         }
 
-        virtual string_type str() const = 0;
-
     protected:
         static uptr to_node(object::uptr p)
         {
@@ -65,22 +63,18 @@ namespace erules { namespace ast {
         {
             return std::make_unique<ident<LexemType>>(this->lexem());
         }
-        string_type str() const override
-        {
-            return this->lexem().raw_value();
-        }
     };
 
     template <typename LexemType>
-    class number : public node<LexemType> {
+    class value : public node<LexemType> {
         using super_type = node<LexemType>;
-        using this_type = number<LexemType>;
+        using this_type = value<LexemType>;
 
     public:
         using char_type = typename LexemType::char_type;
         using string_type = std::basic_string<char_type>;
 
-        number(LexemType lex)
+        value(LexemType lex)
             : super_type(object::info::create<this_type>(), __func__,
                          std::move(lex))
         {
@@ -88,59 +82,6 @@ namespace erules { namespace ast {
         object::uptr clone() const override
         {
             return std::make_unique<this_type>(this->lexem());
-        }
-        string_type str() const override
-        {
-            return this->lexem().raw_value();
-        }
-    };
-
-    template <typename LexemType>
-    class string : public node<LexemType> {
-        using super_type = node<LexemType>;
-        using this_type = string<LexemType>;
-
-    public:
-        using char_type = typename LexemType::char_type;
-        using string_type = std::basic_string<char_type>;
-
-        string(LexemType lex)
-            : super_type(object::info::create<string>(), __func__,
-                         std::move(lex))
-        {
-        }
-        object::uptr clone() const override
-        {
-            return std::make_unique<this_type>(this->lexem());
-        }
-        string_type str() const override
-        {
-            return "\"" + this->lexem().value() + "\"";
-        }
-    };
-
-
-    template <typename LexemType>
-    class floating : public node<LexemType> {
-        using super_type = node<LexemType>;
-        using this_type = floating<LexemType>;
-
-    public:
-        using char_type = typename LexemType::char_type;
-        using string_type = std::basic_string<char_type>;
-
-        floating(LexemType lex)
-            : super_type(object::info::create<this_type>(), __func__,
-                         std::move(lex))
-        {
-        }
-        object::uptr clone() const override
-        {
-            return std::make_unique<this_type>(this->lexem());
-        }
-        string_type str() const override
-        {
-            return this->lexem().raw_value();
         }
     };
 
@@ -167,12 +108,6 @@ namespace erules { namespace ast {
                 this->lexem(), super_type::to_node(left_->clone()),
                 super_type::to_node(right_->clone()));
         }
-        string_type str() const override
-        {
-            return "(" + left_->str() + this->lexem().raw_value()
-                + right_->str() + ")";
-        }
-
         const node_uptr& left() const
         {
             return left_;
@@ -210,11 +145,6 @@ namespace erules { namespace ast {
             return std::make_unique<this_type>(
                 this->lexem(), super_type::to_node(value_->clone()));
         }
-
-        string_type str() const override
-        {
-            return '(' + this->lexem().raw_value() + value_->str() + ')';
-        }
         const node_uptr& value() const
         {
             return value_;
@@ -246,11 +176,6 @@ namespace erules { namespace ast {
             return std::make_unique<postfix_operation<LexemType>>(
                 this->lexem(), super_type::to_node(value_->clone()));
         }
-        string_type str() const override
-        {
-            return "(" + value_->str() + this->lexem().raw_value() + ")";
-        }
-
     private:
         node_uptr value_;
     };
@@ -276,21 +201,13 @@ namespace erules { namespace ast {
             sequence_container cont;
             cont.reserve(container_.size());
             for (auto& v : container_) {
-                cont->emplace_back(v->clone());
+                cont->emplace_back(super_type::to_node(v->clone()));
             }
             return std::make_unique<sequence<LexemType>>(this->lexem(),
                                                          std::move(cont));
         }
-        string_type str() const override
-        {
-            return "[]";
-        }
-
     private:
         sequence_container container_;
-    };
-
-    class operations {
     };
 
 }}

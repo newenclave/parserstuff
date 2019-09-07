@@ -12,6 +12,7 @@ class parser {
 public:
     using node_type = NodeT;
     using lexem_type = LexemT;
+    using this_type = parser<node_type, lexem_type>;
     class state {
         friend class parser;
         state(typename std::vector<lexem_type>::const_iterator current,
@@ -24,8 +25,8 @@ public:
         typename std::vector<lexem_type>::const_iterator next_;
     };
 
-    using led_call_type = std::function<node_type(node_type)>;
-    using nud_call_type = std::function<node_type()>;
+    using led_call_type = std::function<node_type(this_type *, node_type)>;
+    using nud_call_type = std::function<node_type(this_type *)>;
 
     using id_type = typename lexem_type::id_type;
     virtual ~parser() = default;
@@ -78,7 +79,7 @@ public:
         if (nud == nuds_.end()) {
             left = default_nud();
         } else {
-            left = nud->second();
+            left = nud->second(this);
         }
 
         if (!left) {
@@ -88,8 +89,9 @@ public:
         int pp = next_precednse();
         lexem_type pt = next();
         while (p < pp) {
-            led_call_type led_call
-                = [this](auto left) { return default_led(std::move(left)); };
+            led_call_type led_call = [this](auto, auto left) {
+                return default_led(std::move(left));
+            };
 
             auto led = leds_.find(lexem_type::id(pt));
             if (led != leds_.end()) {
@@ -97,7 +99,7 @@ public:
             }
 
             advance();
-            left = led_call(std::move(left));
+            left = led_call(this, std::move(left));
             if (!left) {
                 return left;
             }
@@ -155,14 +157,14 @@ public:
         return itr_precednse(next_);
     }
 
-    node_type default_nud() const
+    node_type default_nud()
     {
-        return default_nud_ ? default_nud_() : node_type{};
+        return default_nud_ ? default_nud_(this) : node_type{};
     }
 
-    node_type default_led(node_type left) const
+    node_type default_led(node_type left)
     {
-        return default_led_ ? default_led_(std::move(left)) : node_type{};
+        return default_led_ ? default_led_(this, std::move(left)) : node_type{};
     }
 
     state store() const
