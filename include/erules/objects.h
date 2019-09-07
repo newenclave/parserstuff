@@ -263,10 +263,8 @@ private:
     map_type un_map_;
 };
 
-template <typename IdType>
 class object_transform_operations {
 public:
-    using id_type = IdType;
     using function_type = std::function<object::uptr(object::ptr)>;
     using index_type = std::tuple<object::info::holder, object::info::holder>;
     using map_type = std::map<index_type, function_type >;

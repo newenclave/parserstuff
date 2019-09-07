@@ -11,8 +11,7 @@
 using mlexer = rule_lexer<char>;
 using lexem_type = typename mlexer::lexem_type;
 using mparser = rule_parser<lexem_type>;
-using operations_type
-    = erules::object_transform_operations<typename lexem_type::id_type>;
+using operations_type = erules::object_transform_operations;
 
 namespace test_parser {
 void run()
