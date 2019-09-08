@@ -39,12 +39,19 @@ void run()
             auto left = string_transform(value->left().get());
             auto right = string_transform(value->right().get());
             return make_string(
-                        '(' + left->value() +
-                        value->lexem().raw_value() +
+                        '(' + left->value() + ' ' +
+                        value->lexem().raw_value() + ' ' +
                         right->value() + ')');
         });
+    to_string.set<east::prefix_operation<lexem_type>, string_obj>(
+        [&](auto value){
+            auto left = string_transform(value->value().get());
+            return make_string(
+                        '(' + value->lexem().raw_value() + ' ' +
+                         left->value() + ')');
+        });
 
-    std::string val = "a + 2 * _5.89";
+    std::string val = "a in 100..9000 and b in 0..1000";
     mlexer lex;
     lex.reset(val);
     auto tokens = lex.read_all(val);

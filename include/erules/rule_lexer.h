@@ -107,6 +107,8 @@ private:
                            create_token_ident(constants::token_type::AND));
         lexer_.add_factory(make_name("or"),
                            create_token_ident(constants::token_type::OR));
+        lexer_.add_factory(make_name("in"),
+                           create_token_ident(constants::token_type::IN));
         lexer_.add_factory(make_name("="),
                            create_token(constants::token_type::EQ));
         lexer_.add_factory(make_name("!="),

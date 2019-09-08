@@ -117,9 +117,9 @@ enum class precedence_type : int {
     LAND,
     CMP,
     IN,
+    PREFIX,
     DOTDOT,
     DOT,
     PAREN,
-    PREFIX,
 };
 }

@@ -138,6 +138,7 @@ private:
         parser_.set_led(constants::token_type::DOT, binary_operation);
         parser_.set_led(constants::token_type::DOTDOT, binary_operation);
 
+        parser_.set_led(constants::token_type::IN, binary_operation);
         parser_.set_led(constants::token_type::EQ, binary_operation);
         parser_.set_led(constants::token_type::NOTEQ, binary_operation);
         parser_.set_led(constants::token_type::LT, binary_operation);
