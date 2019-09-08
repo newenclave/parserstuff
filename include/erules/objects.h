@@ -207,12 +207,34 @@ public:
                  object::info::create<RightT>(),
                  create_call<LeftT, RightT, CallT>(std::move(call)));
     }
+
     object::uptr call(id_type op, object::ptr left, object::ptr right)
+    {
+        if(auto call = get(op, left, right)) {
+            return call(left, right);
+        }
+        return {};
+    }
+
+    template <typename LeftT, typename RightT>
+    function_type get(id_type op, object::ptr left, object::ptr right)
     {
         auto id = std::make_tuple(op, left->type_info(), right->type_info());
         auto find = bin_map_.find(id);
         if(find != bin_map_.end()) {
-            return find->second(left, right);
+            return find->second;
+        }
+        return {};
+    }
+
+    template <typename LeftT, typename RightT>
+    function_type get(id_type op)
+    {
+        auto id = std::make_tuple(op, object::info::create<LeftT>(),
+                                  object::info::create<RightT>());
+        auto find = bin_map_.find(id);
+        if(find != bin_map_.end()) {
+            return find->second;
         }
         return {};
     }
@@ -253,13 +275,33 @@ public:
 
     object::uptr call(id_type op, object::ptr value)
     {
-        auto id = std::make_tuple(op, value->type_info());
-        auto find = un_map_.find(id);
-        if(find != un_map_.end()) {
-            return find->second(value);
+        if(auto call = get(op, value)) {
+            return call(value);
         }
         return {};
     }
+
+    function_type get(id_type op, object::ptr value)
+    {
+        auto id = std::make_tuple(op, value->type_info());
+        auto find = un_map_.find(id);
+        if(find != un_map_.end()) {
+            return find->second;
+        }
+        return {};
+    }
+
+    template <typename ValueT>
+    function_type get(id_type op)
+    {
+        auto id = std::make_tuple(op, object::info::create<ValueT>());
+        auto find = un_map_.find(id);
+        if(find != un_map_.end()) {
+            return find->second;
+        }
+        return {};
+    }
+
 private:
     void set_impl(id_type op,
                   object::info::holder value_type,
@@ -304,6 +346,37 @@ public:
         }
         return {};
     }
+
+    template <typename ToT>
+    std::function<std::unique_ptr<ToT>(object::ptr)> get(object::ptr value)
+    {
+        auto id = std::make_tuple(value->type_info(),
+                                  object::info::create<ToT>());
+        auto find = trans_map_.find(id);
+        if(find != trans_map_.end()) {
+            auto call = find->second;
+            return [call](auto value) {
+                return object::cast<ToT>(call(value));
+            };
+        }
+        return {};
+    }
+
+    template <typename FromT, typename ToT>
+    std::function<std::unique_ptr<ToT>(object::ptr)> get()
+    {
+        auto id = std::make_tuple(object::info::create<FromT>(),
+                                  object::info::create<ToT>());
+        auto find = trans_map_.find(id);
+        if(find != trans_map_.end()) {
+            auto call = find->second;
+            return [call](auto value) {
+                return object::cast<ToT>(call(value));
+            };
+        }
+        return {};
+    }
+
 private:
     void set_impl(object::info::holder from_type,
                   object::info::holder to_type,

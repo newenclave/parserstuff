@@ -22,6 +22,7 @@ void run()
     auto make_string = [](std::string val) {
         return std::make_unique<string_obj>(std::move(val));
     };
+
     auto string_transform = [&to_string](auto obj) {
         return to_string.call<string_obj>(obj);
     };
@@ -62,6 +63,8 @@ void run()
     mparser pars(std::move(tokens));
     auto n = pars.parse();
     auto nc = n->clone();
+    auto transform = to_string.get<string_obj>(n.get());
     std::cout << string_transform(n.get())->value() << "\n";
+    std::cout << transform(n.get())->value() << "\n";
 }
 }
