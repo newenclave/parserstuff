@@ -17,11 +17,11 @@ public:
     {
         object_binary_operations<id_type> result;
         /// + operation. numbers, float, strings
-        result.set<number, number>(
+        result.template set<number, number>(
             constants::token_type::PLUS, [](auto l, auto r) {
                 return std::make_unique<number>(l->value() + r->value());
             });
-        result.set<floating, number>(
+        result.template set<floating, number>(
             constants::token_type::PLUS,
             [](auto l, auto r) {
                 return std::make_unique<floating>(
@@ -29,22 +29,22 @@ public:
                     + static_cast<double>(r->value()));
             },
             true);
-        result.set<string_type, string_type>(
+        result.template set<string_type, string_type>(
             constants::token_type::PLUS, [](auto l, auto r) {
                 return std::make_unique<string_type>(l->value() + r->value());
             });
         /// - number floating
-        result.set<number, number>(
+        result.template set<number, number>(
             constants::token_type::MINUS, [](auto l, auto r) {
                 return std::make_unique<number>(l->value() - r->value());
             });
-        result.set<floating, number>(constants::token_type::MINUS,
+        result.template set<floating, number>(constants::token_type::MINUS,
                                      [](auto l, auto r) {
                                          return std::make_unique<floating>(
                                              static_cast<double>(l->value())
                                              - static_cast<double>(r->value()));
                                      });
-        result.set<number, floating>(constants::token_type::MINUS,
+        result.template set<number, floating>(constants::token_type::MINUS,
                                      [](auto l, auto r) {
                                          return std::make_unique<floating>(
                                              static_cast<double>(l->value())
@@ -52,11 +52,11 @@ public:
                                      });
 
         /// * numbers, float, string * number
-        result.set<number, number>(
+        result.template set<number, number>(
             constants::token_type::MUL, [](auto l, auto r) {
                 return std::make_unique<number>(l->value() * r->value());
             });
-        result.set<floating, number>(
+        result.template set<floating, number>(
             constants::token_type::MUL,
             [](auto l, auto r) {
                 return std::make_unique<floating>(
@@ -64,7 +64,7 @@ public:
                     * static_cast<double>(r->value()));
             },
             true);
-        result.set<string_type, number>(
+        result.template set<string_type, number>(
             constants::token_type::MUL,
             [](auto l, auto r) {
                 std::basic_string<CharT> out;
@@ -79,18 +79,18 @@ public:
             true);
 
         /// / number, float
-        result.set<number, number>(
+        result.template set<number, number>(
             constants::token_type::DIV, [](auto l, auto r) {
                 return std::make_unique<number>(l->value() / r->value());
             });
-        result.set<floating, number>(constants::token_type::DIV,
+        result.template set<floating, number>(constants::token_type::DIV,
                                      [](auto l, auto r) {
                                          return std::make_unique<floating>(
                                              static_cast<double>(l->value())
                                              / static_cast<double>(r->value()));
                                      });
 
-        result.set<number, floating>(constants::token_type::DIV,
+        result.template set<number, floating>(constants::token_type::DIV,
                                      [](auto l, auto r) {
                                          return std::make_unique<floating>(
                                              static_cast<double>(l->value())
@@ -98,7 +98,7 @@ public:
                                      });
 
         /// mod numbers only
-        result.set<number, number>(
+        result.template set<number, number>(
             constants::token_type::MOD, [](auto l, auto r) {
                 return std::make_unique<number>(l->value() % r->value());
             });
@@ -130,9 +130,9 @@ public:
     {
         object_transform_operations result;
 
-        result.set<string<CharT>, object>([](auto ptr) {
-            return std::make_unique<string_type>(ptr->value());
-        });
+//        result.set<ident<CharT>, object>([](auto ptr) {
+//            return std::make_unique<string_type>(ptr->value());
+//        });
 
         return result;
     }

@@ -27,7 +27,7 @@ void run()
     auto transop = erules::transform_operations<char>::get();
 
     std::cout
-        << object::cast<string_obj>(transop.call<erules::object>(&t2))->value()
+        << object::cast<string_obj>(transop.call<erules::object>(&t0))->value()
         << "\n";
 }
 

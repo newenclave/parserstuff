@@ -7,7 +7,8 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <vector>
+#include <iostream>
 
 namespace erules {
 
@@ -57,6 +58,16 @@ public:
         template <typename T>
         static holder create()
         {
+            return create_impl<T>(std::is_abstract<T>{});
+        }
+
+        std::uintptr_t id = 0;
+
+    private:
+
+        template <typename T>
+        static holder create_impl(std::false_type)
+        {
             static_assert(std::is_base_of<object, T>::value,
                           "T must derive from 'object'");
             static std::uintptr_t localid = 0xFFEEBBAA;
@@ -65,18 +76,19 @@ public:
             return holder { &sinfo };
         }
 
-        template <>
-        static holder create<object>()
+        template <typename T>
+        static holder create_impl(std::true_type)
         {
-            static std::uintptr_t localid = 0xFFEEBBAA;
+            static_assert(std::is_base_of<object, T>::value,
+                          "T must derive from 'object'");
+            static std::uintptr_t localid = 0xAABBCCDD;
             static info sinfo(reinterpret_cast<std::uintptr_t>(&localid),
-                              nullptr);
+                []() -> std::unique_ptr<T> {
+                    throw  std::runtime_error("Unable to create abstract type");
+                });
             return holder { &sinfo };
         }
 
-        std::uintptr_t id = 0;
-
-    private:
         std::function<object::uptr()> factory_;
     };
 
@@ -141,10 +153,17 @@ public:
     virtual uptr clone() const = 0;
 
 protected:
+
+    template <typename T>
+    constexpr static bool is_object()
+    {
+        return info::create<T>()->id == info::create<object>()->id;
+    }
+
     template <typename T>
     static void assert_type(object::cptr p)
     {
-        if (p->type_info()->id != info::create<T>()->id) {
+        if (!is_object<T>() && (p->type_info()->id != info::create<T>()->id)) {
             throw std::runtime_error("object is not T");
         }
     }
@@ -366,6 +385,9 @@ public:
     {
         auto id
             = std::make_tuple(value->type_info(), object::info::create<ToT>());
+        std::cout << value->type_info()->id << " "
+                  << object::info::create<ToT>()->id << std::endl;
+
         auto find = trans_map_.find(id);
         if (find != trans_map_.end()) {
             return object::cast<ToT>(find->second(value));
@@ -406,6 +428,7 @@ private:
                   function_type call)
     {
         trans_map_[std::make_tuple(from_type, to_type)] = std::move(call);
+        std::cout << from_type->id << " " << to_type->id <<  std::endl;
     }
     map_type trans_map_;
 };
@@ -443,6 +466,38 @@ public:
         return std::make_unique<string<CharT>>(value());
     }
 
+private:
+    string_type value_;
+};
+
+template <typename CharT>
+class erules_define_template_object(ident, CharT)
+{
+public:
+    using super_type = typed_object<string<CharT>>;
+    using string_type = std::basic_string<CharT>;
+
+    ident(string_type val)
+        : super_type(__func__)
+        , value_(std::move(val))
+    {
+    }
+    ident()
+        : super_type(__func__)
+    {
+    }
+    void set_value(string_type val)
+    {
+        value_ = std::move(val);
+    }
+    const string_type& value() const
+    {
+        return value_;
+    }
+    object::uptr clone() const override
+    {
+        return std::make_unique<string<CharT>>(value());
+    }
 private:
     string_type value_;
 };
