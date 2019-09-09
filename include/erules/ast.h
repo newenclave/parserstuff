@@ -12,7 +12,7 @@ namespace erules { namespace ast {
     template <typename LexemType>
     class node : public object {
     public:
-        using uptr = std::unique_ptr<node<LexemType> >;
+        using uptr = std::unique_ptr<node<LexemType>>;
         using char_type = typename LexemType::char_type;
         using string_type = std::basic_string<char_type>;
 
@@ -31,6 +31,10 @@ namespace erules { namespace ast {
         const LexemType lexem() const
         {
             return lexem_;
+        }
+        void set_lexem(LexemType lex)
+        {
+            lexem_ = std::move(lex);
         }
 
     protected:
@@ -59,6 +63,11 @@ namespace erules { namespace ast {
         {
         }
 
+        ident()
+            : super_type(object::info::create<this_type>(), __func__, {})
+        {
+        }
+
         object::uptr clone() const override
         {
             return std::make_unique<ident<LexemType>>(this->lexem());
@@ -79,6 +88,12 @@ namespace erules { namespace ast {
                          std::move(lex))
         {
         }
+
+        value()
+            : super_type(object::info::create<this_type>(), __func__, {})
+        {
+        }
+
         object::uptr clone() const override
         {
             return std::make_unique<this_type>(this->lexem());
@@ -102,12 +117,29 @@ namespace erules { namespace ast {
             , right_(std::move(rght))
         {
         }
+
+        binary_operation()
+            : super_type(object::info::create<this_type>(), __func__, {})
+        {
+        }
+
         object::uptr clone() const override
         {
             return std::make_unique<binary_operation<LexemType>>(
                 this->lexem(), super_type::to_node(left_->clone()),
                 super_type::to_node(right_->clone()));
         }
+
+        void set_left(node_uptr val)
+        {
+            left_ = std::move(val);
+        }
+
+        void right(node_uptr val)
+        {
+            right_ = std::move(val);
+        }
+
         const node_uptr& left() const
         {
             return left_;
@@ -140,11 +172,22 @@ namespace erules { namespace ast {
         {
         }
 
+        prefix_operation()
+            : super_type(object::info::create<this_type>(), __func__, {})
+        {
+        }
+
         object::uptr clone() const override
         {
             return std::make_unique<this_type>(
                 this->lexem(), super_type::to_node(value_->clone()));
         }
+
+        void set_value(node_uptr val)
+        {
+            value_ = std::move(val);
+        }
+
         const node_uptr& value() const
         {
             return value_;
@@ -171,11 +214,25 @@ namespace erules { namespace ast {
         {
         }
 
+        postfix_operation()
+            : super_type(object::info::create<this_type>(), __func__, {})
+        {
+        }
         object::uptr clone() const override
         {
             return std::make_unique<postfix_operation<LexemType>>(
                 this->lexem(), super_type::to_node(value_->clone()));
         }
+        void set_value(node_uptr val)
+        {
+            value_ = std::move(val);
+        }
+
+        const node_uptr& value() const
+        {
+            return value_;
+        }
+
     private:
         node_uptr value_;
     };
@@ -196,6 +253,22 @@ namespace erules { namespace ast {
         {
         }
 
+        sequence()
+            : super_type(object::info::create<sequence_container>(), __func__,
+                         {})
+        {
+        }
+
+        const sequence_container& value() const
+        {
+            return container_;
+        }
+
+        void value(sequence_container val)
+        {
+            container_ = std::move(val);
+        }
+
         object::uptr clone() const override
         {
             sequence_container cont;
@@ -206,6 +279,7 @@ namespace erules { namespace ast {
             return std::make_unique<sequence<LexemType>>(this->lexem(),
                                                          std::move(cont));
         }
+
     private:
         sequence_container container_;
     };

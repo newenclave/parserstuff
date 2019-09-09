@@ -70,6 +70,9 @@ public:
         parser_.set_precedense(
             constants::token_type::DOTDOT,
             static_cast<int>(constants::precedence_type::DOTDOT));
+        parser_.set_precedense(
+            constants::token_type::DOTDOTDOT,
+            static_cast<int>(constants::precedence_type::DOTDOT));
 
         parser_.set_precedense(
             constants::token_type::IN,
@@ -97,11 +100,14 @@ private:
     {
         auto parse_value = [](auto parser_ptr) {
             auto value = parser_ptr->current();
-            return std::make_unique<erules::ast::value<lexem_type> >(value);
+            return std::make_unique<erules::ast::value<lexem_type>>(value);
         };
         parser_.set_nud(constants::token_type::NUMBER, parse_value);
         parser_.set_nud(constants::token_type::FLOAT, parse_value);
         parser_.set_nud(constants::token_type::STRING, parse_value);
+
+        parser_.set_nud(constants::token_type::BOOL_FALSE, parse_value);
+        parser_.set_nud(constants::token_type::BOOL_TRUE, parse_value);
 
         parser_.set_nud(constants::token_type::IDENT, [](auto parser_ptr) {
             auto value = parser_ptr->current();
@@ -137,6 +143,7 @@ private:
 
         parser_.set_led(constants::token_type::DOT, binary_operation);
         parser_.set_led(constants::token_type::DOTDOT, binary_operation);
+        parser_.set_led(constants::token_type::DOTDOTDOT, binary_operation);
 
         parser_.set_led(constants::token_type::IN, binary_operation);
         parser_.set_led(constants::token_type::EQ, binary_operation);

@@ -74,7 +74,8 @@ struct reader {
     template <typename Itr>
     static Itr read_number(Itr begin, Itr end)
     {
-        return std::find_if_not(begin, end, [](auto c) { return is_digit_(c); });
+        return std::find_if_not(begin, end,
+                                [](auto c) { return is_digit_(c); });
     }
 
     template <typename Itr, typename Itr2>

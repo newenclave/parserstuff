@@ -145,6 +145,8 @@ private:
                            create_token(constants::token_type::DOT));
         lexer_.add_factory(make_name(".."),
                            create_token(constants::token_type::DOTDOT));
+        lexer_.add_factory(make_name("..."),
+                           create_token(constants::token_type::DOTDOTDOT));
     }
 
     using token_state_factory = typename lexer_type::token_state_factory;
@@ -175,13 +177,13 @@ private:
             current_ = istate.end();
             if (current_ != end_ && helpers::reader::is_ident(*current_)) {
                 current_ = helpers::reader::read_ident(current_, end_);
-                state.set_raw_value(string_type{ istate.begin(), current_ });
-                state.set_value(string_type{ istate.begin(), current_ });
+                state.set_raw_value(string_type { istate.begin(), current_ });
+                state.set_value(string_type { istate.begin(), current_ });
                 state.set_token(constants::token_type::IDENT);
             } else {
                 state.set_raw_value(
-                    string_type{ istate.begin(), istate.end() });
-                state.set_value(string_type{ istate.begin(), istate.end() });
+                    string_type { istate.begin(), istate.end() });
+                state.set_value(string_type { istate.begin(), istate.end() });
                 state.set_token(id);
             }
             return state;
@@ -191,7 +193,7 @@ private:
     token_state_factory create_token(id_type id)
     {
         return [this, id](auto state, auto istate) {
-            state.set_raw_value(string_type{ istate.begin(), istate.end() });
+            state.set_raw_value(string_type { istate.begin(), istate.end() });
             state.set_token(id);
             current_ = istate.end();
             return state;
@@ -207,7 +209,7 @@ private:
         return [this, ending, tok](auto state, auto istate) {
             current_ = istate.end();
             auto value = helpers::reader::read_string(current_, end_, ending);
-            state.set_raw_value(string_type{ istate.begin(), current_ });
+            state.set_raw_value(string_type { istate.begin(), current_ });
             state.set_value(std::move(value));
             state.set_token(tok);
             return state;
@@ -237,8 +239,8 @@ private:
     {
         auto begin = current_;
         current_ = helpers::reader::read_ident(current_, end_);
-        state.set_raw_value(string_type{ begin, current_ });
-        state.set_value(string_type{ begin, current_ });
+        state.set_raw_value(string_type { begin, current_ });
+        state.set_value(string_type { begin, current_ });
         state.set_token(constants::token_type::IDENT);
         return state;
     }
@@ -248,13 +250,13 @@ private:
         auto begin = current_;
         if (helpers::reader::check_if_float(begin, end_)) {
             helpers::reader::read_float(current_, end_);
-            state.set_raw_value(string_type{ begin, current_ });
-            state.set_value(string_type{ begin, current_ });
+            state.set_raw_value(string_type { begin, current_ });
+            state.set_value(string_type { begin, current_ });
             state.set_token(constants::token_type::FLOAT);
         } else {
             current_ = helpers::reader::read_number(current_, end_);
-            state.set_raw_value(string_type{ begin, current_ });
-            state.set_value(string_type{ begin, current_ });
+            state.set_raw_value(string_type { begin, current_ });
+            state.set_value(string_type { begin, current_ });
             state.set_token(constants::token_type::NUMBER);
         }
         return state;
@@ -276,7 +278,7 @@ private:
 
     static std::vector<std::size_t> make_new_lines_map(const string_type& input)
     {
-        std::vector<std::size_t> result{ 0 };
+        std::vector<std::size_t> result { 0 };
         std::size_t id = 0;
         for (auto ch : input) {
             if (ch == '\n') {

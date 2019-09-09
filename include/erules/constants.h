@@ -23,6 +23,7 @@ enum class token_type : int {
 
     DOT,
     DOTDOT,
+    DOTDOTDOT,
     COMMA,
 
     IDENT,
@@ -65,6 +66,8 @@ inline std::basic_string<CharT> token_to_string(token_type t)
         return helpers::strings::to_string<CharT>(".");
     case constants::token_type::DOTDOT:
         return helpers::strings::to_string<CharT>("..");
+    case constants::token_type::DOTDOTDOT:
+        return helpers::strings::to_string<CharT>("...");
     case constants::token_type::EQ:
         return helpers::strings::to_string<CharT>("==");
     case constants::token_type::LT:

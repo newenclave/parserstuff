@@ -38,7 +38,7 @@ void test_01()
 {
     std::string test_input = R"(12312312344444)";
 
-    MyLexer lex([&]() { return LexerState{ 0 }; });
+    MyLexer lex([&]() { return LexerState { 0 }; });
 
     lex.add_factory("123", createFactory(123));
     lex.add_factory("123123", createFactory(123123));

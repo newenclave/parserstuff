@@ -25,8 +25,8 @@ public:
         typename std::vector<lexem_type>::const_iterator next_;
     };
 
-    using led_call_type = std::function<node_type(this_type *, node_type)>;
-    using nud_call_type = std::function<node_type(this_type *)>;
+    using led_call_type = std::function<node_type(this_type*, node_type)>;
+    using nud_call_type = std::function<node_type(this_type*)>;
 
     using id_type = typename lexem_type::id_type;
     virtual ~parser() = default;
@@ -139,12 +139,12 @@ public:
 
     lexem_type current() const
     {
-        return eof() ? lexem_type{} : *current_;
+        return eof() ? lexem_type {} : *current_;
     }
 
     lexem_type next() const
     {
-        return next_eof() ? lexem_type{} : *next_;
+        return next_eof() ? lexem_type {} : *next_;
     }
 
     int current_precednse()
@@ -159,12 +159,13 @@ public:
 
     node_type default_nud()
     {
-        return default_nud_ ? default_nud_(this) : node_type{};
+        return default_nud_ ? default_nud_(this) : node_type {};
     }
 
     node_type default_led(node_type left)
     {
-        return default_led_ ? default_led_(this, std::move(left)) : node_type{};
+        return default_led_ ? default_led_(this, std::move(left))
+                            : node_type {};
     }
 
     state store() const
