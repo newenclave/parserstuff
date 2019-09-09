@@ -24,36 +24,11 @@ void run()
     std::cout << t1.type_info()->id << "\n";
 
     auto binop = erules::binary_operations<char>::get();
-    std::cout << binop
-                     .call_cast<string_obj>(constants::token_type::MUL, &t0,
-                                            &t2)
-                     ->value()
-              << "\n";
-    std::cout << binop
-                     .call_cast<string_obj>(constants::token_type::MUL, &t2,
-                                            &t0)
-                     ->value()
-              << "\n";
+    auto transop = erules::transform_operations<char>::get();
 
-    std::cout << binop
-                     .call_cast<floating>(constants::token_type::MUL, &t3, &t2)
-                     ->value()
-              << "\n";
-    std::cout << binop
-                     .call_cast<floating>(constants::token_type::MUL, &t2, &t3)
-                     ->value()
-              << "\n";
-
-    std::cout << binop
-                     .call_cast<floating>(constants::token_type::MINUS, &t2,
-                                          &t3)
-                     ->value()
-              << "\n";
-    std::cout << binop
-                     .call_cast<floating>(constants::token_type::MINUS, &t3,
-                                          &t2)
-                     ->value()
-              << "\n";
+    std::cout
+        << object::cast<string_obj>(transop.call<erules::object>(&t2))->value()
+        << "\n";
 }
 
 }

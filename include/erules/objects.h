@@ -64,6 +64,16 @@ public:
                               []() { return std::make_unique<T>(); });
             return holder { &sinfo };
         }
+
+        template <>
+        static holder create<object>()
+        {
+            static std::uintptr_t localid = 0xFFEEBBAA;
+            static info sinfo(reinterpret_cast<std::uintptr_t>(&localid),
+                              nullptr);
+            return holder { &sinfo };
+        }
+
         std::uintptr_t id = 0;
 
     private:
