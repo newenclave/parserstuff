@@ -22,7 +22,7 @@ struct LexerState {
     iterator tokenBegin;
     iterator tokenEnd;
 };
-using MyLexer = lexer<std::string, LexerState>;
+using MyLexer = erules::lexer<std::string, LexerState>;
 
 MyLexer::token_state_factory createFactory(int value)
 {

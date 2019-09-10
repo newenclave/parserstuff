@@ -11,6 +11,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 list( APPEND src ./include/erules
                  ./include/erules/objects
+                 ./include/erules/filters
                  ./tests
                  )
 

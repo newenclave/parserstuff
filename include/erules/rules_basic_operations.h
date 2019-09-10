@@ -10,7 +10,7 @@ namespace erules { namespace operations {
     template <typename CharT = char, typename LessType = std::less<CharT>>
     class binary_operations {
     public:
-        using lexem_type = rule_lexem<CharT, LessType>;
+        using lexem_type = filters::rule_lexem<CharT, LessType>;
         using id_type = typename lexem_type::id_type;
         using string_type = objects::string<CharT>;
 
@@ -196,7 +196,7 @@ namespace erules { namespace operations {
     template <typename CharT = char, typename LessType = std::less<CharT>>
     class unary_operations {
     public:
-        using lexem_type = rule_lexem<CharT, LessType>;
+        using lexem_type = filters::rule_lexem<CharT, LessType>;
         using id_type = typename lexem_type::id_type;
         static objects::oprerations::unary<id_type> get()
         {
@@ -210,7 +210,7 @@ namespace erules { namespace operations {
     template <typename CharT = char, typename LessType = std::less<CharT>>
     class transform_operations {
     public:
-        using lexem_type = rule_lexem<CharT, LessType>;
+        using lexem_type = filters::rule_lexem<CharT, LessType>;
         using id_type = typename lexem_type::id_type;
         using string_type = objects::string<CharT>;
         static objects::oprerations::transform get()

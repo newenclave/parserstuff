@@ -2,6 +2,7 @@
 #include "trie.h"
 #include <functional>
 
+namespace erules {
 template <typename ConteinerType, typename StateTrait>
 class lexer {
 public:
@@ -93,3 +94,4 @@ private:
     token_state_factory default_factory_
         = [](auto state, auto) { return state; };
 };
+}

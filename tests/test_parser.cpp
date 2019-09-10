@@ -11,8 +11,9 @@
 
 using namespace erules;
 using namespace erules::objects;
+using namespace erules::filters;
 
-using mlexer = rule_lexer<char>;
+using mlexer = filters::lexer<char>;
 using lexem_type = typename mlexer::lexem_type;
 using mparser = rule_parser<lexem_type>;
 using operations_type = oprerations::transform;
