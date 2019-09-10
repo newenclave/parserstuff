@@ -7,6 +7,8 @@
 #include "erules/rules_basic_operations.h"
 
 using namespace erules;
+using namespace erules::objects;
+
 namespace test_objects {
 
 
@@ -18,17 +20,16 @@ void run()
     number t2(3);
     floating t3(11.11);
 
-    std::cout << object::cast<string<char>>(&t1)->type_info()->id << "\n";
+    std::cout << base::cast<string<char>>(&t1)->type_info()->id << "\n";
     std::cout << t2.type_info()->id << "\n";
     std::cout << t3.type_info()->id << "\n";
     std::cout << t1.type_info()->id << "\n";
 
-    auto binop = erules::binary_operations<char>::get();
-    auto transop = erules::transform_operations<char>::get();
+    auto binop = operations::binary_operations<char>::get();
+    auto transop = operations::transform_operations<char>::get();
 
-    std::cout
-        << object::cast<string_obj>(transop.call<erules::object>(&t0))->value()
-        << "\n";
+    std::cout << base::cast<string_obj>(transop.call<base>(&t0))->value()
+              << "\n";
 }
 
 }

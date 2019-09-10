@@ -20,8 +20,8 @@ void run();
 
 int main()
 {
-//    test_lexer::run();
-//    test_parser::run();
+    //    test_lexer::run();
+    //    test_parser::run();
     test_objects::run();
     return 0;
 }

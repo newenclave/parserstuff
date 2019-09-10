@@ -7,18 +7,22 @@
 #include "erules/rule_lexem.h"
 #include "erules/rule_lexer.h"
 #include "erules/rule_parser.h"
+#include "erules/rules_basic_operations.h"
+
+using namespace erules;
+using namespace erules::objects;
 
 using mlexer = rule_lexer<char>;
 using lexem_type = typename mlexer::lexem_type;
 using mparser = rule_parser<lexem_type>;
-using operations_type = erules::object_transform_operations;
+using operations_type = oprerations::transform;
 
 namespace test_parser {
 void run()
 {
     operations_type to_string;
-    using string_obj = erules::string<char>;
-    namespace east = erules::ast;
+    using string_obj = string<char>;
+    namespace east = ast;
     auto make_string = [](std::string val) {
         return std::make_unique<string_obj>(std::move(val));
     };

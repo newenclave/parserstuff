@@ -5,12 +5,14 @@
 #include "parser.h"
 #include "rule_lexem.h"
 
+namespace erules {
+
 template <typename LexemT>
 class rule_parser {
 public:
     using lexem_type = LexemT;
     using char_type = typename lexem_type::char_type;
-    using node_uptr = typename erules::ast::node<lexem_type>::uptr;
+    using node_uptr = typename objects::ast::node<lexem_type>::uptr;
     using parser_type = parser<node_uptr, lexem_type>;
     using stream_type = std::basic_stringstream<char_type>;
 
@@ -100,7 +102,7 @@ private:
     {
         auto parse_value = [](auto parser_ptr) {
             auto value = parser_ptr->current();
-            return std::make_unique<erules::ast::value<lexem_type>>(value);
+            return std::make_unique<objects::ast::value<lexem_type>>(value);
         };
         parser_.set_nud(constants::token_type::NUMBER, parse_value);
         parser_.set_nud(constants::token_type::FLOAT, parse_value);
@@ -111,7 +113,7 @@ private:
 
         parser_.set_nud(constants::token_type::IDENT, [](auto parser_ptr) {
             auto value = parser_ptr->current();
-            return std::make_unique<erules::ast::ident<lexem_type>>(value);
+            return std::make_unique<objects::ast::ident<lexem_type>>(value);
         });
 
         auto prefix_operation = [this](auto parser_ptr) {
@@ -119,7 +121,7 @@ private:
                 = static_cast<int>(constants::precedence_type::PREFIX);
             auto operation = parser_ptr->current();
             parser_ptr->advance();
-            return std::make_unique<erules::ast::prefix_operation<lexem_type>>(
+            return std::make_unique<objects::ast::prefix_operation<lexem_type>>(
                 operation, parser_ptr->parse_expression(precedence));
         };
         parser_.set_nud(constants::token_type::NOT, prefix_operation);
@@ -131,7 +133,7 @@ private:
             auto pp = parser_ptr->current_precednse();
             parser_ptr->advance();
             auto right = parser_ptr->parse_expression(pp);
-            return std::make_unique<erules::ast::binary_operation<lexem_type>>(
+            return std::make_unique<objects::ast::binary_operation<lexem_type>>(
                 std::move(current), std::move(left), std::move(right));
         };
 
@@ -166,3 +168,5 @@ private:
 
     parser_type parser_;
 };
+
+}

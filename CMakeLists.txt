@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 14)
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 list( APPEND src ./include/erules
+                 ./include/erules/objects
                  ./tests
                  )
 

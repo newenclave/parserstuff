@@ -7,10 +7,10 @@
 #include "erules/helpers.h"
 #include "erules/objects.h"
 
-namespace erules { namespace ast {
+namespace erules { namespace objects { namespace ast {
 
     template <typename LexemType>
-    class node : public object {
+    class node : public base {
     public:
         using uptr = std::unique_ptr<node<LexemType>>;
         using char_type = typename LexemType::char_type;
@@ -18,8 +18,8 @@ namespace erules { namespace ast {
 
         virtual ~node() = default;
 
-        node(object::info::holder info, std::string name, LexemType lexem)
-            : object(std::move(info))
+        node(base::info::holder info, std::string name, LexemType lexem)
+            : base(std::move(info))
             , name_("ast::" + std::move(name))
             , lexem_(std::move(lexem))
         {
@@ -38,7 +38,7 @@ namespace erules { namespace ast {
         }
 
     protected:
-        static uptr to_node(object::uptr p)
+        static uptr to_node(base::uptr p)
         {
             return uptr(static_cast<node*>(p.release()));
         }
@@ -58,17 +58,17 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
 
         ident(LexemType lex)
-            : super_type(object::info::create<this_type>(), __func__,
+            : super_type(base::info::create<this_type>(), __func__,
                          std::move(lex))
         {
         }
 
         ident()
-            : super_type(object::info::create<this_type>(), __func__, {})
+            : super_type(base::info::create<this_type>(), __func__, {})
         {
         }
 
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             return std::make_unique<ident<LexemType>>(this->lexem());
         }
@@ -84,17 +84,17 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
 
         value(LexemType lex)
-            : super_type(object::info::create<this_type>(), __func__,
+            : super_type(base::info::create<this_type>(), __func__,
                          std::move(lex))
         {
         }
 
         value()
-            : super_type(object::info::create<this_type>(), __func__, {})
+            : super_type(base::info::create<this_type>(), __func__, {})
         {
         }
 
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             return std::make_unique<this_type>(this->lexem());
         }
@@ -111,7 +111,7 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
 
         binary_operation(LexemType lex, node_uptr lft, node_uptr rght)
-            : super_type(object::info::create<this_type>(), __func__,
+            : super_type(base::info::create<this_type>(), __func__,
                          std::move(lex))
             , left_(std::move(lft))
             , right_(std::move(rght))
@@ -119,11 +119,11 @@ namespace erules { namespace ast {
         }
 
         binary_operation()
-            : super_type(object::info::create<this_type>(), __func__, {})
+            : super_type(base::info::create<this_type>(), __func__, {})
         {
         }
 
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             return std::make_unique<binary_operation<LexemType>>(
                 this->lexem(), super_type::to_node(left_->clone()),
@@ -166,18 +166,18 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
 
         prefix_operation(LexemType lex, node_uptr val)
-            : super_type(object::info::create<this_type>(), __func__,
+            : super_type(base::info::create<this_type>(), __func__,
                          std::move(lex))
             , value_(std::move(val))
         {
         }
 
         prefix_operation()
-            : super_type(object::info::create<this_type>(), __func__, {})
+            : super_type(base::info::create<this_type>(), __func__, {})
         {
         }
 
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             return std::make_unique<this_type>(
                 this->lexem(), super_type::to_node(value_->clone()));
@@ -208,17 +208,17 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
 
         postfix_operation(LexemType lex, node_uptr value)
-            : super_type(object::info::create<postfix_operation>(), __func__,
+            : super_type(base::info::create<postfix_operation>(), __func__,
                          std::move(lex))
             , value_(std::move(value))
         {
         }
 
         postfix_operation()
-            : super_type(object::info::create<this_type>(), __func__, {})
+            : super_type(base::info::create<this_type>(), __func__, {})
         {
         }
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             return std::make_unique<postfix_operation<LexemType>>(
                 this->lexem(), super_type::to_node(value_->clone()));
@@ -247,15 +247,14 @@ namespace erules { namespace ast {
         using string_type = std::basic_string<char_type>;
         using sequence_container = std::vector<node_uptr>;
         sequence(LexemType lex, sequence_container container)
-            : super_type(object::info::create<sequence_container>(), __func__,
+            : super_type(base::info::create<sequence_container>(), __func__,
                          std::move(lex))
             , container_(std::move(container))
         {
         }
 
         sequence()
-            : super_type(object::info::create<sequence_container>(), __func__,
-                         {})
+            : super_type(base::info::create<sequence_container>(), __func__, {})
         {
         }
 
@@ -269,7 +268,7 @@ namespace erules { namespace ast {
             container_ = std::move(val);
         }
 
-        object::uptr clone() const override
+        base::uptr clone() const override
         {
             sequence_container cont;
             cont.reserve(container_.size());
@@ -284,4 +283,4 @@ namespace erules { namespace ast {
         sequence_container container_;
     };
 
-}}
+}}}
