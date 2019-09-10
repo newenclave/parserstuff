@@ -28,7 +28,8 @@ void run()
     auto binop = operations::binary_operations<char>::get();
     auto transop = operations::transform_operations<char>::get();
 
-    std::cout << base::cast<string_obj>(transop.call<base>(&t0))->value()
+    std::cout << binop.call_cast<boolean>(constants::token_type::EQ, &t2, &t2)
+                     ->value()
               << "\n";
 }
 

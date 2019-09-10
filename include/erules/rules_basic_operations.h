@@ -107,7 +107,89 @@ namespace erules { namespace operations {
                     return std::make_unique<number>(l->value() % r->value());
                 });
 
+            fill_logic(result);
             return result;
+        }
+
+        static void fill_logic(objects::oprerations::binary<id_type>& result)
+        {
+            auto logic_EQ = [](auto left, auto right) { return left == right; };
+            auto logic_NEQ
+                = [](auto left, auto right) { return left != right; };
+            auto logic_LT = [](auto left, auto right) { return left < right; };
+            auto logic_GT = [](auto left, auto right) { return left > right; };
+            auto logic_LEQ
+                = [](auto left, auto right) { return left <= right; };
+            auto logic_GEQ
+                = [](auto left, auto right) { return left >= right; };
+
+            /// numbers
+            result.template set<number, number>(constants::token_type::EQ,
+                                                create_logic(logic_EQ));
+            result.template set<number, number>(constants::token_type::NOTEQ,
+                                                create_logic(logic_NEQ));
+            result.template set<number, number>(constants::token_type::LT,
+                                                create_logic(logic_LT));
+            result.template set<number, number>(constants::token_type::GT,
+                                                create_logic(logic_GT));
+            result.template set<number, number>(constants::token_type::LEQ,
+                                                create_logic(logic_LEQ));
+            result.template set<number, number>(constants::token_type::GEQ,
+                                                create_logic(logic_GEQ));
+
+            /// strings
+            result.template set<string_type, string_type>(
+                constants::token_type::EQ, create_logic(logic_EQ));
+            result.template set<string_type, string_type>(
+                constants::token_type::NOTEQ, create_logic(logic_NEQ));
+            result.template set<string_type, string_type>(
+                constants::token_type::LT, create_logic(logic_LT));
+            result.template set<string_type, string_type>(
+                constants::token_type::GT, create_logic(logic_GT));
+            result.template set<string_type, string_type>(
+                constants::token_type::LEQ, create_logic(logic_LEQ));
+            result.template set<string_type, string_type>(
+                constants::token_type::GEQ, create_logic(logic_GEQ));
+
+            /// floating
+            result.template set<floating, floating>(constants::token_type::EQ,
+                                                    create_logic(logic_EQ));
+            result.template set<floating, floating>(
+                constants::token_type::NOTEQ, create_logic(logic_NEQ));
+            result.template set<floating, floating>(constants::token_type::LT,
+                                                    create_logic(logic_LT));
+            result.template set<floating, floating>(constants::token_type::GT,
+                                                    create_logic(logic_GT));
+            result.template set<floating, floating>(constants::token_type::LEQ,
+                                                    create_logic(logic_LEQ));
+            result.template set<floating, floating>(constants::token_type::GEQ,
+                                                    create_logic(logic_GEQ));
+
+            /// boolean
+            result.template set<boolean, boolean>(constants::token_type::EQ,
+                                                  create_logic(logic_EQ));
+            result.template set<boolean, boolean>(constants::token_type::NOTEQ,
+                                                  create_logic(logic_NEQ));
+            result.template set<boolean, boolean>(constants::token_type::LT,
+                                                  create_logic(logic_LT));
+            result.template set<boolean, boolean>(constants::token_type::GT,
+                                                  create_logic(logic_GT));
+            result.template set<boolean, boolean>(constants::token_type::LEQ,
+                                                  create_logic(logic_LEQ));
+            result.template set<boolean, boolean>(constants::token_type::GEQ,
+                                                  create_logic(logic_GEQ));
+
+            /// arrays
+        }
+
+    private:
+        template <typename CallT>
+        static auto create_logic(CallT call)
+        {
+            return [call](auto left, auto right) {
+                return std::make_unique<boolean>(
+                    call(left->value(), right->value()));
+            };
         }
     };
 
