@@ -64,6 +64,8 @@ inline std::basic_string<CharT> token_to_string(token_type t)
         return helpers::strings::to_string<CharT>("%");
     case constants::token_type::DOT:
         return helpers::strings::to_string<CharT>(".");
+    case constants::token_type::COMMA:
+        return helpers::strings::to_string<CharT>(",");
     case constants::token_type::DOTDOT:
         return helpers::strings::to_string<CharT>("..");
     case constants::token_type::DOTDOTDOT:
@@ -120,6 +122,7 @@ enum class precedence_type : int {
     LAND,
     CMP,
     IN,
+    COMMA,
     PREFIX,
     DOTDOT,
     DOT,

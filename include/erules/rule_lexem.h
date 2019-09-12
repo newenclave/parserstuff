@@ -13,6 +13,7 @@ namespace erules { namespace filters {
         using string_type = std::basic_string<char_type>;
         using less_type = LessType;
         using id_type = constants::token_type;
+        // using id_type = string_type;
 
         struct position_type {
             std::size_t line = 0;

@@ -144,6 +144,8 @@ namespace erules { namespace filters {
             lexer_.add_factory(make_name("%"),
                                create_token(constants::token_type::MOD));
 
+            lexer_.add_factory(make_name(","),
+                               create_token(constants::token_type::COMMA));
             lexer_.add_factory(make_name("."),
                                create_token(constants::token_type::DOT));
             lexer_.add_factory(make_name(".."),
@@ -154,13 +156,9 @@ namespace erules { namespace filters {
 
         using token_state_factory = typename lexer_type::token_state_factory;
 
-        string_type make_name(const std::string val)
+        string_type make_name(const std::string& val)
         {
-            string_type result;
-            for (auto c : val) {
-                result.push_back(static_cast<CharT>(c));
-            }
-            return result;
+            return helpers::strings::to_string<CharT>(val);
         }
 
         lexem_type next()

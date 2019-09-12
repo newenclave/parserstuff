@@ -4,6 +4,7 @@
 #include "erules/objects.h"
 #include "erules/operations.h"
 #include "erules/rule_lexem.h"
+#include <sstream>
 
 namespace erules { namespace operations {
 
@@ -213,16 +214,79 @@ namespace erules { namespace operations {
         using lexem_type = filters::rule_lexem<CharT, LessType>;
         using id_type = typename lexem_type::id_type;
         using string_type = objects::string<CharT>;
+        using stream_type = std::basic_stringstream<CharT>;
         static objects::oprerations::transform get()
         {
             using namespace objects;
             objects::oprerations::transform result;
 
-            //        result.set<ident<CharT>, object>([](auto ptr) {
-            //            return std::make_unique<string_type>(ptr->value());
-            //        });
+            result.template set<number, string_type>(
+                [](auto num) { return to_string(num->value()); });
+
+            result.template set<floating, string_type>(
+                [](auto num) { return to_string(num->value()); });
+
+            result.template set<boolean, string_type>([](auto val) {
+                return to_string(
+                    val->value() ? helpers::strings::to_string<CharT>("true")
+                                 : helpers::strings::to_string<CharT>("false"));
+            });
+
+            result.template set<string_type, string_type>(
+                [](auto val) { return val->clone(); });
+
+            result.template set<string_type, number>([](auto num) {
+                auto val = num->value();
+                auto num_val
+                    = helpers::reader::read_int(val.begin(), val.end());
+                return std::make_unique<number>(num_val);
+            });
+
+            result.template set<string_type, number>(
+                [](auto str) -> base::uptr {
+                    auto val = str->value();
+                    int inval = -1;
+                    auto num_val = helpers::reader::read_int(val.begin(),
+                                                             val.end(), &inval);
+                    if (-1 != inval) {
+                        return {};
+                    }
+                    return std::make_unique<number>(num_val);
+                });
+
+            result.template set<string_type, floating>([](auto str) {
+                auto val = str->value();
+                auto num_val
+                    = helpers::reader::read_float(val.begin(), val.end());
+                return std::make_unique<floating>(num_val);
+            });
+
+            result.template set<string_type, boolean>(
+                [](auto str) -> base::uptr {
+                    using std_string = std::basic_string<CharT>;
+                    static const std_string bool_values[]
+                        = { std_string({ 'f', 'a', 'l', 's', 'e' }),
+                            std_string({ 't', 'r', 'u', 'e' }) };
+                    auto val = str->value();
+                    if (val == bool_values[0]) {
+                        return std::make_unique<boolean>(false);
+                    } else if (val == bool_values[1]) {
+                        return std::make_unique<boolean>(true);
+                    }
+
+                    return {};
+                });
+
 
             return result;
+        }
+
+        template <typename T>
+        static objects::base::uptr to_string(const T& value)
+        {
+            stream_type ss;
+            ss << value;
+            return std::make_unique<string_type>(ss.str());
         }
     };
 }}

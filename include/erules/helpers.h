@@ -190,6 +190,7 @@ struct reader {
         return read_float(bb, std::end(cont));
     }
 
+
     template <typename ItrT>
     static double read_float(ItrT& s, ItrT end)
     {
@@ -252,6 +253,58 @@ struct reader {
             --s;
         }
         return a;
+    }
+
+    template <typename CharT>
+    static std::uint8_t char2int(CharT cc)
+    {
+        std::uint8_t c = static_cast<std::uint8_t>(cc);
+        switch (c) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            return c - '0';
+            // case 'a': case 'b': case 'c':
+            // case 'd': case 'e': case 'f':
+            //	return c - 'a' + 0xa;
+            // case 'A': case 'B': case 'C':
+            // case 'D': case 'E': case 'F':
+            //	return c - 'A' + 0xA;
+        }
+        return 0xFF;
+    }
+
+    template <typename ItrT>
+    static std::int64_t read_int(ItrT begin, ItrT end,
+                                 int* first_inval = nullptr)
+    {
+        std::uint64_t res = 0;
+        *first_inval = -1;
+
+        int pos = 0;
+        for (; begin != end; ++begin) {
+            auto c = *begin;
+            if (!is_gap(c)) {
+                if (valid_for_dec_(c)) {
+                    res *= 10;
+                    res += char2int(c);
+                    ++pos;
+                } else {
+                    if (first_inval) {
+                        *first_inval = pos;
+                    }
+                    return 0;
+                }
+            }
+        }
+        return res;
     }
 };
 }

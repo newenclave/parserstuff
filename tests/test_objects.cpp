@@ -15,7 +15,7 @@ namespace test_objects {
 void run()
 {
     using string_obj = string<char>;
-    string<char> t0("!");
+    string<char> t0("true");
     string<char> t1;
     number t2(3);
     floating t3(11.11);
@@ -27,6 +27,8 @@ void run()
 
     auto binop = operations::binary_operations<char>::get();
     auto transop = operations::transform_operations<char>::get();
+
+    auto bval = transop.call<boolean>(&t0);
 
     std::cout << binop.call_cast<boolean>(constants::token_type::EQ, &t2, &t2)
                      ->value()
