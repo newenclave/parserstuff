@@ -11,10 +11,13 @@ namespace erules { namespace rules {
         using char_type = CharT;
         using key_type = KeyT;
         using less_type = LessT;
-        using base_parser = common::parser_base<char_type, key_type, less_type>;
+        using node_type = typename ast::node<char_type, key_type>::uptr;
+        using base_parser = common::parser_base<node_type,
+                                                char_type, key_type, less_type>;
         using lexer_type = lexer<char_type, key_type, less_type>;
 
     private:
+
         base_parser parser_;
         lexer_type lexer_;
     };
