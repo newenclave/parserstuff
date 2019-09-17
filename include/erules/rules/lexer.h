@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "erules/common/helpers.h"
 #include "erules/common/lexer_base.h"
@@ -164,6 +165,12 @@ namespace erules { namespace rules {
                         return read_number(std::move(state), std::move(istate));
                     } else if (helpers::reader::is_ident(*current_)) {
                         return read_ident(std::move(state), std::move(istate));
+                    } else {
+                        std::stringstream ss;
+                        ss << "unexpected symbol '" << *current_ << "' "
+                           << " at " << state.pos().line << ":"
+                           << state.pos().pos;
+                        throw std::runtime_error(ss.str());
                     }
                 }
                 return state;
