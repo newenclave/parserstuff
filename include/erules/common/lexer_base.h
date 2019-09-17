@@ -56,7 +56,8 @@ namespace erules { namespace common {
 
         lexer_base(create_state_factory create_factory,
                    token_state_factory default_factory = nullptr)
-            : default_factory_(get_default_factory(default_factory))
+            : create_factory_(std::move(create_factory))
+            , default_factory_(get_default_factory(default_factory))
         {
         }
 
