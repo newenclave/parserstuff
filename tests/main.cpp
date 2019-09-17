@@ -1,27 +1,20 @@
-
+#include "erules/common/parser_base.h"
+#include "erules/rules/ast.h"
 #include <iostream>
 
-#include "erules/ast.h"
-#include "erules/helpers.h"
-#include "erules/lexer.h"
-#include "erules/parser.h"
-#include "erules/rule_lexer.h"
-#include "erules/rule_parser.h"
+using namespace erules::common;
+using namespace erules::rules;
 
-namespace test_lexer {
-void run();
-}
-namespace test_parser {
-void run();
-}
-namespace test_objects {
-void run();
-}
+struct node {
+    using uptr = std::unique_ptr<node>;
+};
+
+using parser = parser_base<node::uptr, char, std::string>;
+using lexer = parser::lexer_type;
 
 int main()
 {
-    //    test_lexer::run();
-    //    test_parser::run();
-    test_objects::run();
+    lexer lex;
+
     return 0;
 }
