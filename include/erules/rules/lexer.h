@@ -23,6 +23,11 @@ namespace erules { namespace rules {
         using factory_type = typename lexer_type::token_state_factory;
         using lexer_state = typename lexer_type::internal_state;
 
+        lexer(const lexer&) = delete;
+        lexer& operator = (const lexer&) = delete;
+        lexer(lexer&&) = delete;
+        lexer& operator = (lexer&&) = delete;
+
         lexer()
         {
             lexer_.set_create_factory(
@@ -54,12 +59,13 @@ namespace erules { namespace rules {
 
         void set_ident_key(key_type key)
         {
-            ident_reader_ = [this, key](auto state, auto) {
+            ident_key_ = key;
+            ident_reader_ = [this](auto state, auto) {
                 auto begin = current_;
                 current_ = helpers::reader::read_ident(current_, end_);
                 state.set_raw_value(string_type { begin, current_ });
                 state.set_value(string_type { begin, current_ });
-                state.set_key(key);
+                state.set_key(ident_key_);
                 return state;
             };
         }
@@ -88,6 +94,18 @@ namespace erules { namespace rules {
             };
         }
 
+        void set_key(key_type key, const string_type &value,
+                     bool force_ident = false)
+        {
+            using helpers::reader;
+            bool possible_ident = reader::is_ident(value.begin(), value.end());
+            if(possible_ident || force_ident) {
+                lexer_.add_factory(value, create_value_ident_factory(key));
+            } else {
+                lexer_.add_factory(value, create_value_factory(key));
+            }
+        }
+
         bool eof() const
         {
             return current_ == end_;
@@ -105,6 +123,7 @@ namespace erules { namespace rules {
         }
 
     private:
+
         string_type makestr(const std::string& val)
         {
             return helpers::strings::to_string<CharT>(val);
@@ -122,20 +141,50 @@ namespace erules { namespace rules {
             return res;
         }
 
+        auto create_value_factory(key_type key)
+        {
+            return [this, key](auto state, auto istate) {
+                state.set_raw_value(
+                    string_type { istate.begin(), istate.end() });
+                state.set_key(key);
+                current_ = istate.end();
+                return state;
+            };
+        }
+
+        auto create_value_ident_factory(key_type key)
+        {
+            return [this, key](auto state, auto istate) {
+                current_ = istate.end();
+                if (current_ != end_ && helpers::reader::is_ident(*current_)) {
+                    current_ = helpers::reader::read_ident(current_, end_);
+                    state.set_raw_value(
+                        string_type { istate.begin(), current_ });
+                    state.set_value(string_type { istate.begin(), current_ });
+                    state.set_key(ident_key_);
+                } else {
+                    state.set_raw_value(
+                        string_type { istate.begin(), istate.end() });
+                    state.set_value(
+                        string_type { istate.begin(), istate.end() });
+                    state.set_key(key);
+                }
+                return state;
+            };
+        }
+
         static auto create_empty_reader()
         {
             return [](auto state, auto) { return state; };
         }
 
-        // clang-format off
         factory_type create_string_factory(string_type ending, key_type id)
-        // clang-format on
         {
             return [this, ending, id](auto state, auto istate) {
                 current_ = istate.end();
                 auto value
                     = helpers::reader::read_string(current_, end_, ending);
-                state.set_raw_value(string_type { istate.begin(), current_ });
+                state.set_raw_value( { istate.begin(), current_ });
                 state.set_value(std::move(value));
                 state.set_key(id);
                 return state;
@@ -167,7 +216,7 @@ namespace erules { namespace rules {
                         return read_ident(std::move(state), std::move(istate));
                     } else {
                         std::stringstream ss;
-                        ss << "unexpected symbol '" << *current_ << "' "
+                        ss << "Unexpected symbol '" << *current_ << "' "
                            << " at " << state.pos().line << ":"
                            << state.pos().pos;
                         throw std::runtime_error(ss.str());
@@ -209,6 +258,8 @@ namespace erules { namespace rules {
         iterator end_;
         std::vector<std::size_t> newline_map_;
         lexer_type lexer_;
+
+        key_type ident_key_ = {};
 
         //// functions;
         factory_type string_reader_ = create_empty_reader();
