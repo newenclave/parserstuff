@@ -5,7 +5,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace erules { namespace objects {
+namespace erules { namespace rules { namespace objects {
 
     struct base {
     public:
@@ -168,4 +168,4 @@ namespace erules { namespace objects {
     {
         return lh.type_info()->id < rh.type_info()->id;
     }
-}}
+}}}
