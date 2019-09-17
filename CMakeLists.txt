@@ -15,11 +15,11 @@ list( APPEND src ./include/erules
                  ./tests
                  )
 
-foreach( src_dir ${src} )
+foreach(src_dir ${src})
     aux_source_directory(${src_dir} lib_src)
     file(GLOB headers ${src_dir}/*.h)
     list(APPEND lib_src ${headers})
-endforeach( )
+endforeach()
 
 add_executable( ${PROJECT_NAME} ${lib_src} )
 
