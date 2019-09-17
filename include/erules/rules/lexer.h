@@ -111,6 +111,12 @@ namespace erules { namespace rules {
             return current_ == end_;
         }
 
+        std::vector<token_info> run(string_type input)
+        {
+            reset(std::move(input));
+            return run();
+        }
+
         std::vector<token_info> run()
         {
             std::vector<token_info> result;

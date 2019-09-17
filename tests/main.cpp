@@ -22,6 +22,7 @@ int main()
     lex.set_float_key("FLOAT");
     lex.set_key("MINUS", "-");
     lex.reset(test1);
+
     auto vals = lex.run();
 
     for(auto t: vals) {
