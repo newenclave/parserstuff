@@ -14,7 +14,6 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
         using uptr = std::unique_ptr<this_type>;
         using string_type = std::basic_string<char_type>;
-        using uptr = std::unique_ptr<this_type>;
 
         node(node&&) = default;
         node& operator=(node&&) = default;
@@ -110,14 +109,14 @@ namespace erules { namespace rules { namespace ast {
     class binary_operation : public node<CharT, KeyT> {
         using super_type = node<CharT, KeyT>;
         using this_type = binary_operation<CharT, KeyT>;
-
+        using super_uptr = typename super_type::uptr;
     public:
         using char_type = CharT;
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        binary_operation(token_info inf, super_type::uptr lft,
-                         super_type::uptr rght)
+        binary_operation(token_info inf, typename super_type::uptr lft,
+                         typename super_type::uptr rght)
             : super_type(std::move(inf), "ast::" + __func__)
             , left_(std::move(lft))
             , right_(std::move(rght))
@@ -137,8 +136,8 @@ namespace erules { namespace rules { namespace ast {
         }
 
     private:
-        super_type::uptr left_;
-        super_type::uptr right_;
+        typename super_type::uptr left_;
+        typename super_type::uptr right_;
     };
 
     template <typename CharT, typename KeyT>
@@ -151,9 +150,9 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        unary_operation(token_info inf, super_type::uptr val)
+        unary_operation(token_info inf, typename super_type::uptr val)
             : super_type(std::move(inf), "ast::" + __func__)
-            , value_(std::move(lft))
+            , value_(std::move(val))
         {
         }
 
@@ -163,7 +162,7 @@ namespace erules { namespace rules { namespace ast {
         }
 
     protected:
-        super_type::uptr value_;
+        typename super_type::uptr value_;
     };
 
     template <typename CharT, typename KeyT>
@@ -177,9 +176,8 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        ptefix_operation(token_info inf, super_type::uptr val)
+        ptefix_operation(token_info inf, typename super_type::uptr val)
             : super_type(std::move(inf), "ast::" + __func__)
-            , value_(std::move(lft))
         {
         }
 
@@ -191,7 +189,7 @@ namespace erules { namespace rules { namespace ast {
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                token_info(), node_type::cast(value_->clone()));
+                token_info(), node_type::cast(this->value_->clone()));
         }
     };
 
@@ -206,9 +204,8 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        postfix_operation(token_info inf, super_type::uptr val)
+        postfix_operation(token_info inf, typename super_type::uptr val)
             : super_type(std::move(inf), "ast::" + __func__)
-            , value_(std::move(lft))
         {
         }
 
@@ -220,7 +217,7 @@ namespace erules { namespace rules { namespace ast {
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                token_info(), node_type::cast(value_->clone()));
+                token_info(), node_type::cast(this->value_->clone()));
         }
     };
 }}}

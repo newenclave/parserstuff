@@ -23,5 +23,11 @@ int main()
     lex.reset(test1);
     auto vals = lex.run();
 
+    for(auto t: vals) {
+
+        std::cout << t.key() << " (" << t.value() << ") "
+                  << t.pos().line << ":" << t.pos().pos << "\n";
+    }
+
     return 0;
 }

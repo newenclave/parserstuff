@@ -50,7 +50,8 @@ namespace erules { namespace common {
         {
             value_ = std::move(val);
         }
-        const string_type& set_value() const
+
+        const string_type& value() const
         {
             return value_.empty() ? raw_value_ : value_;
         }
