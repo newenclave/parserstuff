@@ -184,15 +184,14 @@ namespace erules { namespace rules {
             return [](auto state, auto) { return state; };
         }
 
-        factory_type create_string_factory(string_type ending, key_type id)
+        factory_type create_string_factory(string_type ending, key_type key)
         {
-            return [this, ending, id](auto state, auto istate) {
+            return [this, ending, key](auto state, auto istate) {
                 current_ = istate.end();
-                auto value
-                    = helpers::reader::read_string(current_, end_, ending);
-                state.set_raw_value( { istate.begin(), current_ });
-                state.set_value(std::move(value));
-                state.set_key(id);
+                auto val = helpers::reader::read_string(current_, end_, ending);
+                state.set_raw_value({ istate.begin(), current_ });
+                state.set_value(std::move(val));
+                state.set_key(key);
                 return state;
             };
         }
