@@ -247,7 +247,7 @@ namespace erules { namespace rules {
         static std::vector<std::size_t>
         make_new_lines_map(const string_type& input)
         {
-            std::vector<std::size_t> result { 0 };
+            std::vector<std::size_t> result { 0, };
             std::size_t id = 0;
             for (auto ch : input) {
                 if (ch == '\n') {
