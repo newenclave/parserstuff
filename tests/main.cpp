@@ -42,9 +42,8 @@ int main()
             + " " + op.call(value->right().get()) + ")";
     });
 
-
     parser_type par;
-    std::string test1 = "a * (4 + 2) * ident1";
+    std::string test1 = "ident1-- + 17-- * 89";
     par.set_ident_key("IDENT");
     par.set_string_key("STRING");
     par.set_number_key("NUMBER");
@@ -53,12 +52,13 @@ int main()
     par.add_binary_operation("+", "+");
     par.add_binary_operation("*", "*", 2);
     par.add_prefix_operation("--", "--", 5);
+    par.add_postfix_operation("--", "--", 5);
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < 1000000; ++i) {
+    for (int i = 0; i < 1; ++i) {
         auto vals = par.run(test1);
-        op.call(vals.get());
+        std::cout << op.call(vals.get()) << "\n";
     }
 
     auto stop = std::chrono::high_resolution_clock::now();

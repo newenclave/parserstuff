@@ -71,7 +71,6 @@ namespace erules { namespace rules {
         void add_prefix_operation(key_type key, const string_type& value,
                                   int precedence = 0)
         {
-            parser_.set_precedense(key, precedence);
             lexer_.set_key(key, value);
             parser_.set_nud(key, [precedence](auto ptr) {
                 return parse_prefix_operation(ptr, precedence);
@@ -83,7 +82,7 @@ namespace erules { namespace rules {
         {
             parser_.set_precedense(key, precedence);
             lexer_.set_key(key, value);
-            parser_.set_nud(key, parse_postfix_operation);
+            parser_.set_led(key, parse_postfix_operation);
         }
 
         node_uptr run(string_type input)
@@ -128,10 +127,8 @@ namespace erules { namespace rules {
         static node_uptr parse_postfix_operation(base_parser* ptr,
                                                  node_uptr left)
         {
-            auto current = ptr->current();
-            auto pp = ptr->current_precednse();
-            ptr->advance();
-            return std::make_unique<ast_postfix_operation>(std::move(current),
+            auto value = ptr->current();
+            return std::make_unique<ast_postfix_operation>(std::move(value),
                                                            std::move(left));
         };
 

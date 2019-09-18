@@ -7,11 +7,11 @@
 
 namespace erules { namespace rules { namespace objects { namespace oprerations {
 
-    template <typename KeyT, typename OutT = base::uptr>
+    template <typename KeyT, typename ResultT = base::uptr>
     class binary {
     public:
         using key_type = KeyT;
-        using result_type = OutT;
+        using result_type = ResultT;
 
         using function_type = std::function<result_type(base::ptr, base::ptr)>;
         using index_type
@@ -98,11 +98,11 @@ namespace erules { namespace rules { namespace objects { namespace oprerations {
         map_type bin_map_;
     };
 
-    template <typename KeyT, typename OutT = base::uptr>
+    template <typename KeyT, typename ResultT = base::uptr>
     class unary {
     public:
         using key_type = KeyT;
-        using result_type = OutT;
+        using result_type = ResultT;
         using function_type = std::function<result_type(base::ptr)>;
         using index_type = std::tuple<key_type, base::info::holder>;
         using map_type = std::map<index_type, function_type>;
@@ -238,10 +238,10 @@ namespace erules { namespace rules { namespace objects { namespace oprerations {
         map_type trans_map_;
     };
 
-    template <typename OutT = base::uptr>
+    template <typename ResultT = base::uptr>
     class transform {
     public:
-        using result_type = OutT;
+        using result_type = ResultT;
         using function_type = std::function<result_type(base::ptr)>;
         using index_type = base::info::holder;
         using map_type = std::map<index_type, function_type>;
@@ -293,11 +293,11 @@ namespace erules { namespace rules { namespace objects { namespace oprerations {
         map_type calls_;
     };
 
-    template <typename KeyT, typename OutT = base::uptr>
+    template <typename KeyT, typename ResultT = base::uptr>
     class all {
     public:
         using key_type = KeyT;
-        using result_type = OutT;
+        using result_type = ResultT;
         using binary_type = binary<KeyT, result_type>;
         using unary_type = unary<KeyT, result_type>;
         using cast_type = cast;
