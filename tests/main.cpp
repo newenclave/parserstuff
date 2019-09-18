@@ -2,8 +2,8 @@
 #include "erules/rules/objects/operations.h"
 #include "erules/rules/parser.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 
 using namespace erules::common;
 using namespace erules::rules;
@@ -54,16 +54,19 @@ int main()
     par.add_binary_operation("*", "*", 2);
     par.add_prefix_operation("--", "--", 5);
 
-	auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
 
-	for(int i=0; i<1000000; ++i)  {
-		auto vals = par.run(test1);
-		op.call(vals.get());
-	}
+    for (int i = 0; i < 1000000; ++i) {
+        auto vals = par.run(test1);
+        op.call(vals.get());
+    }
 
-	auto stop = std::chrono::high_resolution_clock::now();
+    auto stop = std::chrono::high_resolution_clock::now();
 
-	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << "\n";
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(stop
+                                                                       - start)
+                     .count()
+              << "\n";
 
     // for(auto t: vals) {
 
