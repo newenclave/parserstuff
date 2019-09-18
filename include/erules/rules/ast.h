@@ -1,6 +1,6 @@
 #pragma once
 #include "erules/common/lexer_base.h"
-#include "erules/rules/objects/base.h"
+#include "erules/rules/objects/operations.h"
 
 namespace erules { namespace rules { namespace ast {
 
@@ -14,6 +14,7 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
         using uptr = std::unique_ptr<this_type>;
         using string_type = std::basic_string<char_type>;
+		using operations_type = rules::objects::oprerations::all<key_type>;
 
         node(node&&) = default;
         node& operator=(node&&) = default;
