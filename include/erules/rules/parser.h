@@ -65,8 +65,25 @@ namespace erules { namespace rules {
         {
             parser_.set_precedense(key, precedence);
             lexer_.set_key(key, value);
-            parser_.set_precedense(key, precedence);
             parser_.set_led(key, parse_binary_operation);
+        }
+
+        void add_prefix_operation(key_type key, const string_type& value,
+                                  int precedence = 0)
+        {
+            parser_.set_precedense(key, precedence);
+            lexer_.set_key(key, value);
+            parser_.set_nud(key, [precedence](auto ptr) {
+                return parse_prefix_operation(ptr, precedence);
+            });
+        }
+
+        void add_postfix_operation(key_type key, const string_type& value,
+                                   int precedence = 0)
+        {
+            parser_.set_precedense(key, precedence);
+            lexer_.set_key(key, value);
+            parser_.set_nud(key, parse_postfix_operation);
         }
 
         node_uptr run(string_type input)

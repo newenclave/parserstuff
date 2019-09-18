@@ -143,6 +143,15 @@ namespace erules { namespace rules { namespace ast {
                 super_type::cast(right_->clone()));
         }
 
+        typename super_type::uptr& left()
+        {
+            return left_;
+        }
+        typename super_type::uptr& right()
+        {
+            return right_;
+        }
+
     private:
         typename super_type::uptr left_;
         typename super_type::uptr right_;
@@ -159,10 +168,14 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         unary_operation(objects::base::info::holder tinfo, token_info inf,
-                        typename super_type::uptr val)
+                        std::string type_name, typename super_type::uptr val)
             : super_type(tinfo, std::move(inf), std::string("ast::") + __func__)
             , value_(std::move(val))
         {
+        }
+        typename super_type::uptr& value()
+        {
+            return value_;
         }
 
     protected:
@@ -182,13 +195,14 @@ namespace erules { namespace rules { namespace ast {
 
         ptefix_operation(token_info inf, typename node_type::uptr val)
             : super_type(objects::base::info::create<this_type>(),
-                         std::move(inf), std::string("ast::") + __func__)
+                         std::move(inf), std::string("ast::") + __func__,
+                         std::move(val))
         {
         }
 
         ptefix_operation()
             : super_type(objects::base::info::create<this_type>(), {},
-                         std::string("ast::") + __func__)
+                         std::string("ast::") + __func__, nullptr)
         {
         }
 
@@ -212,13 +226,14 @@ namespace erules { namespace rules { namespace ast {
 
         postfix_operation(token_info inf, typename node_type::uptr val)
             : super_type(objects::base::info::create<this_type>(),
-                         std::move(inf), std::string("ast::") + __func__)
+                         std::move(inf), std::string("ast::") + __func__,
+                         std::move(val))
         {
         }
 
         postfix_operation()
             : super_type(objects::base::info::create<this_type>(), {},
-                         std::string("ast::") + __func__)
+                         std::string("ast::") + __func__, nullptr)
         {
         }
 

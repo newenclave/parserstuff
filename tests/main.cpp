@@ -14,6 +14,7 @@ struct node {
 using parser_type = parser<char, std::string>;
 using lexer_type = typename parser_type::lexer_type;
 using operations = objects::oprerations::all<std::string, std::string>;
+using transform = typename operations::transfrom_type;
 
 using ident_type = typename parser_type::ast_ident;
 using value_type = typename parser_type::ast_value;
@@ -23,20 +24,38 @@ using postfix_type = typename parser_type::ast_postfix_operation;
 
 int main()
 {
-    operations op;
-    op.get_transfrom().set<ident_type>(
-        [](auto ident) { return ident->info().value(); });
+    transform op;
+
+    op.set<ident_type>([&](auto value) { return value->info().value(); });
+    op.set<value_type>([&](auto value) { return value->info().value(); });
+    op.set<prefix_type>([&](auto value) {
+        return "(" + value->info().value() + " " + op.call(value->value().get())
+            + ")";
+    });
+    op.set<postfix_type>([&](auto value) {
+        return "(" + op.call(value->value().get()) + " " + value->info().value()
+            + ")";
+    });
+    op.set<binop_type>([&](auto value) {
+        return "(" + op.call(value->left().get()) + " " + value->info().value()
+            + " " + op.call(value->right().get()) + ")";
+    });
+
+
     parser_type par;
-    std::string test1 = "test";
+    std::string test1 = "a * 4 + 2 * ident1";
     par.set_ident_key("IDENT");
     par.set_string_key("STRING");
     par.set_number_key("NUMBER");
     par.set_float_key("FLOAT");
+    par.set_paren_pair("(", "(", ")", ")");
     par.add_binary_operation("+", "+");
+    par.add_binary_operation("*", "*", 2);
+    par.add_prefix_operation("--", "--", 5);
 
     auto vals = par.run(test1);
 
-    std::cout << op.get_transfrom().call(vals.get());
+    std::cout << op.call(vals.get());
 
     // for(auto t: vals) {
 
