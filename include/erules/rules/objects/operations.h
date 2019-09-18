@@ -1,19 +1,17 @@
 #pragma once
-#include <map>
 #include <functional>
+#include <map>
 #include <tuple>
 
 #include "erules/rules/objects/base.h"
 
-namespace erules { namespace rules { 
-	
-namespace objects { namespace oprerations {
+namespace erules { namespace rules { namespace objects { namespace oprerations {
 
     template <typename KeyT, typename OutT = base::uptr>
     class binary {
     public:
         using key_type = KeyT;
-		using result_type = OutT;
+        using result_type = OutT;
 
         using function_type = std::function<result_type(base::ptr, base::ptr)>;
         using index_type
@@ -51,7 +49,7 @@ namespace objects { namespace oprerations {
                      create_call<LeftT, RightT, CallT>(std::move(call)));
         }
 
-		result_type call(key_type op, base::ptr left, base::ptr right)
+        result_type call(key_type op, base::ptr left, base::ptr right)
         {
             if (auto call = get(op, left, right)) {
                 return call(left, right);
@@ -104,7 +102,7 @@ namespace objects { namespace oprerations {
     class unary {
     public:
         using key_type = KeyT;
-		using result_type = OutT;
+        using result_type = OutT;
         using function_type = std::function<result_type(base::ptr)>;
         using index_type = std::tuple<key_type, base::info::holder>;
         using map_type = std::map<index_type, function_type>;
@@ -124,7 +122,7 @@ namespace objects { namespace oprerations {
                      create_call<ValueT, CallT>(std::move(call)));
         }
 
-		result_type call(key_type op, base::ptr value)
+        result_type call(key_type op, base::ptr value)
         {
             if (auto call = get(op, value)) {
                 return call(value);
@@ -240,88 +238,93 @@ namespace objects { namespace oprerations {
         map_type trans_map_;
     };
 
-	template <typename OutT = base::uptr>
-	class transform {
-	public:
-		using result_type = OutT;
-		using function_type = std::function<result_type(base::ptr)>;
-		using index_type = base::info::holder;
-		using map_type = std::map<index_type, function_type>;
-	private:
-		template <typename ValueT, typename CallT>
-		static function_type create_unary_call(CallT call)
-		{
-			return [call](auto obj) { return call(base::cast<ValueT>(obj)); };
-		}
-		template <typename FromT, typename CallT>
-		void set(CallT call)
-		{
-			auto id = base::info::create<FromT>();
-			calls_[id] = create_unary_call<FromT>(std::move(call));
-		}
+    template <typename OutT = base::uptr>
+    class transform {
+    public:
+        using result_type = OutT;
+        using function_type = std::function<result_type(base::ptr)>;
+        using index_type = base::info::holder;
+        using map_type = std::map<index_type, function_type>;
 
-		result_type call(base::ptr value)
-		{
-			if(auto call_val = get(value)) {
-				return call_val(value);
-			}
-			return {};
-		}
+    private:
+        template <typename ValueT, typename CallT>
+        static function_type create_unary_call(CallT call)
+        {
+            return [call](auto obj) { return call(base::cast<ValueT>(obj)); };
+        }
 
-		function_type get(base::ptr value)
-		{
-			auto itr = calls_.find(value->type_info());
-			if(itr != calls_.end()) {
-				return itr->second;
-			}
-			return {}; 
-		}
+    public:
+        template <typename FromT, typename CallT>
+        void set(CallT call)
+        {
+            auto id = base::info::create<FromT>();
+            calls_[id] = create_unary_call<FromT>(std::move(call));
+        }
 
-		template <typename FromT>
-		function_type get()
-		{
-			auto itr = calls_.find(base::info::create<FromT>());
-			if(itr != calls_.end()) {
-				return itr->second;
-			}
-			return {}; 
-		}
-	private:
-		map_type calls_;
-	};
+        result_type call(base::ptr value)
+        {
+            if (auto call_val = get(value)) {
+                return call_val(value);
+            }
+            return {};
+        }
 
-	template <typename KeyT, typename OutT = base::uptr>
-	class all {
-	public:
+        function_type get(base::ptr value)
+        {
+            auto inf = value->type_info();
+            auto itr = calls_.find(inf);
+            if (itr != calls_.end()) {
+                return itr->second;
+            }
+            return {};
+        }
 
-		using key_type = KeyT;
-		using result_type = OutT;
-		using binary_type = binary<KeyT, result_type>;
-		using unary_type = unary<KeyT, result_type>;
-		using cast_type = cast;
-		using transfrom_type = transform<result_type>;
+        template <typename FromT>
+        function_type get()
+        {
+            auto itr = calls_.find(base::info::create<FromT>());
+            if (itr != calls_.end()) {
+                return itr->second;
+            }
+            return {};
+        }
 
-		binary_type &get_binary()
-		{
-			return binary_;
-		}
-		unary_type &get_unary()
-		{
-			return unary_;
-		}
-		cast_type &get_cast()
-		{
-			return cast_;
-		}
-		transfrom_type &get_transfrom()
-		{
-			return transfrom_;
-		}
-	private:
-		binary_type binary_;
-		unary_type unary_;
-		cast_type cast_;
-		transfrom_type transfrom_;
-	};
+    private:
+        map_type calls_;
+    };
+
+    template <typename KeyT, typename OutT = base::uptr>
+    class all {
+    public:
+        using key_type = KeyT;
+        using result_type = OutT;
+        using binary_type = binary<KeyT, result_type>;
+        using unary_type = unary<KeyT, result_type>;
+        using cast_type = cast;
+        using transfrom_type = transform<result_type>;
+
+        binary_type& get_binary()
+        {
+            return binary_;
+        }
+        unary_type& get_unary()
+        {
+            return unary_;
+        }
+        cast_type& get_cast()
+        {
+            return cast_;
+        }
+        transfrom_type& get_transfrom()
+        {
+            return transfrom_;
+        }
+
+    private:
+        binary_type binary_;
+        unary_type unary_;
+        cast_type cast_;
+        transfrom_type transfrom_;
+    };
 
 }}}}

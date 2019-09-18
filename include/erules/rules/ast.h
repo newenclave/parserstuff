@@ -14,15 +14,16 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
         using uptr = std::unique_ptr<this_type>;
         using string_type = std::basic_string<char_type>;
-		using operations_type = rules::objects::oprerations::all<key_type>;
+        using operations_type = rules::objects::oprerations::all<key_type>;
 
         node(node&&) = default;
         node& operator=(node&&) = default;
         node(const node&) = default;
         node& operator=(const node&) = default;
 
-        node(token_info inf, std::string name)
-            : objects::base(objects::base::info::create<this_type>())
+        node(objects::base::info::holder tinfo, token_info inf,
+             std::string name)
+            : objects::base(tinfo)
             , info_(std::move(inf))
             , name_(std::move(name))
         {
@@ -65,12 +66,14 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         ident(token_info inf)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(),
+                         std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         ident()
-            : super_type({}, std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(), {},
+                         std::string("ast::") + __func__)
         {
         }
 
@@ -91,12 +94,14 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         value(token_info inf)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(),
+                         std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         value()
-            : super_type({}, std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(), {},
+                         std::string("ast::") + __func__)
         {
         }
 
@@ -118,14 +123,16 @@ namespace erules { namespace rules { namespace ast {
 
         binary_operation(token_info inf, typename super_type::uptr lft,
                          typename super_type::uptr rght)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(),
+                         std::move(inf), std::string("ast::") + __func__)
             , left_(std::move(lft))
             , right_(std::move(rght))
         {
         }
 
         binary_operation()
-            : super_type({}, std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(), {},
+                         std::string("ast::") + __func__)
         {
         }
 
@@ -151,14 +158,10 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        unary_operation(token_info inf, typename super_type::uptr val)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+        unary_operation(objects::base::info::holder tinfo, token_info inf,
+                        typename super_type::uptr val)
+            : super_type(tinfo, std::move(inf), std::string("ast::") + __func__)
             , value_(std::move(val))
-        {
-        }
-
-        unary_operation()
-            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
@@ -178,12 +181,14 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         ptefix_operation(token_info inf, typename node_type::uptr val)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(),
+                         std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         ptefix_operation()
-            : super_type({}, std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(), {},
+                         std::string("ast::") + __func__)
         {
         }
 
@@ -206,12 +211,14 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         postfix_operation(token_info inf, typename node_type::uptr val)
-            : super_type(std::move(inf), std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(),
+                         std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         postfix_operation()
-            : super_type({}, std::string("ast::") + __func__)
+            : super_type(objects::base::info::create<this_type>(), {},
+                         std::string("ast::") + __func__)
         {
         }
 
