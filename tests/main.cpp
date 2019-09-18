@@ -44,7 +44,7 @@ int main()
 
     parser_type par;
     std::string test1 = "(ident1-- + 17-- * 89 + [AND] eq 13 eq [eq]) as "
-                        "boolean in (1, 2, 3, 4, 5, 6)";
+                        "boolean in (1, 2, 3, 4, 5, 6) and \"string\"";
     par.set_ident_key("IDENT");
     par.set_string_key("STRING");
     par.set_number_key("NUMBER");
@@ -53,6 +53,7 @@ int main()
     par.add_binary_operation("+", "+");
     par.add_binary_operation("eq", "eq", 1);
     par.add_binary_operation("in", "in", 1);
+    par.add_binary_operation("and", "and", 1);
     par.add_binary_operation("as", "as", 1);
     par.add_binary_operation("*", "*", 2);
     par.add_binary_operation(",", ",", 0);
@@ -63,7 +64,7 @@ int main()
     auto start = std::chrono::high_resolution_clock::now();
 
     auto vals = par.run(test1);
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 1; ++i) {
         vals = par.run(test1);
         /// std::cout << op.call(vals.get()) << "\n";
     }
@@ -75,12 +76,6 @@ int main()
                                                                        - start)
                      .count()
               << "\n";
-
-    // for(auto t: vals) {
-
-    //    std::cout << t.key() << " (" << t.value() << ") "
-    //              << t.pos().line << ":" << t.pos().pos << "\n";
-    //}
 
     return 0;
 }
