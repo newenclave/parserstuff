@@ -43,8 +43,8 @@ int main()
     });
 
     parser_type par;
-    std::string test1
-        = "(ident1-- + 17-- * 89 + [AND] eq 13 eq [eq]) as boolean";
+    std::string test1 = "(ident1-- + 17-- * 89 + [AND] eq 13 eq [eq]) as "
+                        "boolean in (1, 2, 3, 4, 5, 6)";
     par.set_ident_key("IDENT");
     par.set_string_key("STRING");
     par.set_number_key("NUMBER");
@@ -52,8 +52,10 @@ int main()
     par.set_paren_pair("(", "(", ")", ")");
     par.add_binary_operation("+", "+");
     par.add_binary_operation("eq", "eq", 1);
+    par.add_binary_operation("in", "in", 1);
     par.add_binary_operation("as", "as", 1);
     par.add_binary_operation("*", "*", 2);
+    par.add_binary_operation(",", ",", 0);
     par.add_prefix_operation("--", "--", 5);
     par.add_postfix_operation("--", "--", 5);
     par.add_string_key("IDENT", "[", "]", true);
