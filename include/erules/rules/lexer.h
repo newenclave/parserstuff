@@ -57,6 +57,12 @@ namespace erules { namespace rules {
             lexer_.add_factory(makestr("\""), create_string_factory("\"", key));
         }
 
+        void add_string_key(key_type key, const string_type begin,
+                            const string_type& end)
+        {
+            lexer_.add_factory(begin, create_string_factory(end, key));
+        }
+
         void set_ident_key(key_type key)
         {
             ident_key_ = key;
@@ -229,7 +235,6 @@ namespace erules { namespace rules {
                 return state;
             };
         }
-
 
         typename token_info::position itr_pos(iterator itr) const
         {
