@@ -97,15 +97,14 @@ namespace erules { namespace common {
     private:
         static token_state_factory get_default_factory(token_state_factory val)
         {
-            return val ? val : [](token_info state, internal_state) {
-                return state;
-            };
+            return val ? val
+                       : [](token_info state, internal_state) { return state; };
         }
 
         token_trie trie_;
         create_state_factory create_factory_ = []() { return token_info {}; };
         token_state_factory default_factory_
-            = [](token_info  state, internal_state) { return state; };
+            = [](token_info state, internal_state) { return state; };
     };
 
 }}

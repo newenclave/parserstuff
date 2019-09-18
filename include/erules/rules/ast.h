@@ -32,7 +32,7 @@ namespace erules { namespace rules { namespace ast {
             return name_.c_str();
         }
 
-        const token_info info() const
+        const token_info& info() const
         {
             return info_;
         }
@@ -43,9 +43,9 @@ namespace erules { namespace rules { namespace ast {
         }
 
     protected:
-        uptr cast(objects::base::uptr val)
+        static uptr cast(objects::base::uptr val)
         {
-            return uptr(val.release());
+            return uptr(static_cast<this_type*>(val.release()));
         }
 
     private:
@@ -64,18 +64,18 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         ident(token_info inf)
-            : super_type(std::move(inf), "ast::" + __func__)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         ident()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
         objects::base::uptr clone() const override
         {
-            return std::make_unique<this_type>(token_info());
+            return std::make_unique<this_type>(info());
         }
     };
 
@@ -90,18 +90,18 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         value(token_info inf)
-            : super_type(std::move(inf), "ast::" + __func__)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         value()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
         objects::base::uptr clone() const override
         {
-            return std::make_unique<this_type>(token_info());
+            return std::make_unique<this_type>(info());
         }
     };
 
@@ -109,7 +109,7 @@ namespace erules { namespace rules { namespace ast {
     class binary_operation : public node<CharT, KeyT> {
         using super_type = node<CharT, KeyT>;
         using this_type = binary_operation<CharT, KeyT>;
-        using super_uptr = typename super_type::uptr;
+
     public:
         using char_type = CharT;
         using key_type = KeyT;
@@ -117,21 +117,21 @@ namespace erules { namespace rules { namespace ast {
 
         binary_operation(token_info inf, typename super_type::uptr lft,
                          typename super_type::uptr rght)
-            : super_type(std::move(inf), "ast::" + __func__)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
             , left_(std::move(lft))
             , right_(std::move(rght))
         {
         }
 
         binary_operation()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                token_info(), super_type::cast(left_->clone()),
+                info(), super_type::cast(left_->clone()),
                 super_type::cast(right_->clone()));
         }
 
@@ -151,13 +151,13 @@ namespace erules { namespace rules { namespace ast {
         using token_info = common::token_info<char_type, key_type>;
 
         unary_operation(token_info inf, typename super_type::uptr val)
-            : super_type(std::move(inf), "ast::" + __func__)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
             , value_(std::move(val))
         {
         }
 
         unary_operation()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
@@ -176,20 +176,20 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        ptefix_operation(token_info inf, typename super_type::uptr val)
-            : super_type(std::move(inf), "ast::" + __func__)
+        ptefix_operation(token_info inf, typename node_type::uptr val)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         ptefix_operation()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                token_info(), node_type::cast(this->value_->clone()));
+                info(), node_type::cast(this->value_->clone()));
         }
     };
 
@@ -204,20 +204,20 @@ namespace erules { namespace rules { namespace ast {
         using key_type = KeyT;
         using token_info = common::token_info<char_type, key_type>;
 
-        postfix_operation(token_info inf, typename super_type::uptr val)
-            : super_type(std::move(inf), "ast::" + __func__)
+        postfix_operation(token_info inf, typename node_type::uptr val)
+            : super_type(std::move(inf), std::string("ast::") + __func__)
         {
         }
 
         postfix_operation()
-            : super_type({}, "ast::" + __func__)
+            : super_type({}, std::string("ast::") + __func__)
         {
         }
 
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                token_info(), node_type::cast(this->value_->clone()));
+                info(), node_type::cast(this->value_->clone()));
         }
     };
 }}}

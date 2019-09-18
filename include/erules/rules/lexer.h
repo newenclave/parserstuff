@@ -1,8 +1,8 @@
 #pragma once
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 #include "erules/common/helpers.h"
 #include "erules/common/lexer_base.h"
@@ -24,9 +24,9 @@ namespace erules { namespace rules {
         using lexer_state = typename lexer_type::internal_state;
 
         lexer(const lexer&) = delete;
-        lexer& operator = (const lexer&) = delete;
+        lexer& operator=(const lexer&) = delete;
         lexer(lexer&&) = delete;
-        lexer& operator = (lexer&&) = delete;
+        lexer& operator=(lexer&&) = delete;
 
         lexer()
         {
@@ -94,12 +94,12 @@ namespace erules { namespace rules {
             };
         }
 
-        void set_key(key_type key, const string_type &value,
+        void set_key(key_type key, const string_type& value,
                      bool force_ident = false)
         {
             using helpers::reader;
             bool possible_ident = reader::is_ident(value.begin(), value.end());
-            if(possible_ident || force_ident) {
+            if (possible_ident || force_ident) {
                 lexer_.add_factory(value, create_value_ident_factory(key));
             } else {
                 lexer_.add_factory(value, create_value_factory(key));
@@ -129,7 +129,6 @@ namespace erules { namespace rules {
         }
 
     private:
-
         string_type makestr(const std::string& val)
         {
             return helpers::strings::to_string<CharT>(val);
@@ -246,7 +245,9 @@ namespace erules { namespace rules {
         static std::vector<std::size_t>
         make_new_lines_map(const string_type& input)
         {
-            std::vector<std::size_t> result { 0, };
+            std::vector<std::size_t> result {
+                0,
+            };
             std::size_t id = 0;
             for (auto ch : input) {
                 if (ch == '\n') {

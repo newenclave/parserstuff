@@ -14,22 +14,21 @@ using lexer_type = typename parser_type::lexer_type;
 
 int main()
 {
-    lexer_type lex;
-    std::string test1 = "test \"213 123\" 12.90 8987 -test";
-    lex.set_ident_key("IDENT");
-    lex.set_string_key("STRING");
-    lex.set_number_key("NUMBER");
-    lex.set_float_key("FLOAT");
-    lex.set_key("MINUS", "-");
-    lex.reset(test1);
+    parser_type par;
+    std::string test1 = "test + 2";
+    par.set_ident_key("IDENT");
+    par.set_string_key("STRING");
+    par.set_number_key("NUMBER");
+    par.set_float_key("FLOAT");
+    par.add_binary_operation("+", "+");
 
-    auto vals = lex.run();
+    auto vals = par.run(test1);
 
-    for(auto t: vals) {
+    // for(auto t: vals) {
 
-        std::cout << t.key() << " (" << t.value() << ") "
-                  << t.pos().line << ":" << t.pos().pos << "\n";
-    }
+    //    std::cout << t.key() << " (" << t.value() << ") "
+    //              << t.pos().line << ":" << t.pos().pos << "\n";
+    //}
 
     return 0;
 }

@@ -43,6 +43,12 @@ namespace erules { namespace common {
 
         virtual ~parser_base() = default;
 
+        parser_base()
+            : current_(lexem_.begin())
+            , next_(lexem_.begin())
+        {
+        }
+
         parser_base(std::vector<lexem_type> lexem)
             : lexem_(std::move(lexem))
             , current_(lexem_.begin())
@@ -105,7 +111,7 @@ namespace erules { namespace common {
                     return default_led(std::move(left));
                 };
 
-                auto led = leds_.find(lexem_type::id(pt));
+                auto led = leds_.find(pt.key());
                 if (led != leds_.end()) {
                     led_call = led->second;
                 }
@@ -197,7 +203,7 @@ namespace erules { namespace common {
             if (itr == lexem_.cend()) {
                 return -1;
             }
-            auto found = precedenses_.find(lexem_type::id(*itr));
+            auto found = precedenses_.find(itr->key());
             return found == precedenses_.end() ? -1 : found->second;
         }
 
