@@ -1,5 +1,7 @@
 #include "erules/rules/ast.h"
 #include "erules/rules/parser.h"
+#include "erules/rules/objects/operations.h"
+
 #include <iostream>
 
 using namespace erules::common;
@@ -11,9 +13,11 @@ struct node {
 
 using parser_type = parser<char, std::string>;
 using lexer_type = typename parser_type::lexer_type;
+using operations = objects::oprerations::all<std::string, std::string>;
 
 int main()
 {
+	operations op;
     parser_type par;
     std::string test1 = "test + 2";
     par.set_ident_key("IDENT");
