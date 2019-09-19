@@ -44,13 +44,14 @@ int main()
 
     parser_type par;
     std::string test1 = "(ident1-- + 17-- * 89 + [AND] eq 13 eq [eq]) as "
-                        "boolean in (1, 2, 3, 4, 5, 6)";
+                        "boolean in (1, 2, 3, 4, 5, 6) {}";
     par.set_ident_key("IDENT");
     par.set_string_key("STRING");
     par.set_number_key("NUMBER");
     par.set_float_key("FLOAT");
     par.set_paren_pair("(", "(", ")", ")");
     par.add_binary_operation("+", "+");
+	par.set_key("{}", "{}");
     par.add_binary_operation("eq", "eq", 1);
     par.add_binary_operation("in", "in", 1);
     par.add_binary_operation("as", "as", 1);

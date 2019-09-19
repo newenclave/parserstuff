@@ -46,6 +46,13 @@ namespace erules { namespace rules {
             parser_.set_nud(key, parse_value);
             lexer_.set_string_key(std::move(key));
         }
+		void set_key(key_type key, const string_type& value,
+			bool force_ident = false)
+		{
+			lexer_.set_key(key, value, force_ident);
+			parser_.set_nud(key, parse_value);
+		}
+
         void add_string_key(key_type key, const string_type& begin,
                             const string_type& end, bool is_ident = false)
         {
