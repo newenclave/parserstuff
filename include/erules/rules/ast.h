@@ -79,7 +79,7 @@ namespace erules { namespace rules { namespace ast {
 
         objects::base::uptr clone() const override
         {
-            return std::make_unique<this_type>(info());
+            return std::make_unique<this_type>(this->info());
         }
     };
 
@@ -107,7 +107,7 @@ namespace erules { namespace rules { namespace ast {
 
         objects::base::uptr clone() const override
         {
-            return std::make_unique<this_type>(info());
+            return std::make_unique<this_type>(this->info());
         }
     };
 
@@ -139,7 +139,7 @@ namespace erules { namespace rules { namespace ast {
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                info(), super_type::cast(left_->clone()),
+                this->info(), super_type::cast(left_->clone()),
                 super_type::cast(right_->clone()));
         }
 
@@ -209,7 +209,7 @@ namespace erules { namespace rules { namespace ast {
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                info(), node_type::cast(this->value_->clone()));
+                this->info(), node_type::cast(this->value_->clone()));
         }
     };
 
@@ -240,7 +240,7 @@ namespace erules { namespace rules { namespace ast {
         objects::base::uptr clone() const override
         {
             return std::make_unique<this_type>(
-                info(), node_type::cast(this->value_->clone()));
+                this->info(), node_type::cast(this->value_->clone()));
         }
     };
 }}}
